@@ -1,0 +1,105 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;1,400&family=Open+Sans:wght@400;600&display=swap");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --accent-color: #94CA21;
+    --secondary-color: #79A6DE;
+    --dark-color: #222222;
+    --white-color: #FFFFFF;
+    --body-text-color: #414141;
+    --light-text-color: #686868;
+    --link-color: #94CA21;
+    --background-color: #F9F9F9;
+}
+
+/* Fonts */
+:root {
+    --body-font: 'Raleway', sans-serif;
+    --heading-font: 'Kalam', cursive;
+    --sub-heading-font: 'Raleway', sans-serif;
+}
+
+body {
+    font-family: var(--body-font);
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.6em;
+    letter-spacing: 0.02em;
+    color: var(--light-text-color);
+}
+
+.hero-title {
+    font-size: 3.938rem;
+    font-family: var(--heading-font);
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.text-primary {
+    color: var(--accent-color) !important;
+}
+
+.border-outline-primary {
+    border-color: var(--accent-color) !important;
+    border-width: 2px !important;
+}
+
+.border-outline-primary:hover {
+    background-color: var(--accent-color);
+    color: #F9F9F9;
+}
+
+section#hero {
+    background: var(--background-color);
+}
+
+.hero-content {
+    padding: 200px 0px;
+}
+
+.hero-paragraph {
+    font-size: 1.313rem !important;
+}
+
+.pattern-overlay.pattern-right {
+    right: 0px;
+    bottom: 0px;
+}
+
+.pattern-overlay.pattern-left {
+    bottom: 0px;
+}
+
+.search-block {
+    background: #FFFFFF;
+    border: 1px solid #FAFAFA;
+    box-shadow: 0px 12px 90px rgba(12, 12, 12, 0.06);
+    border-radius: 9px;
+    position: absolute;
+    margin-top: -135px;
+    left: 0;
+    right: 0;
+}
+
+@media only screen and (max-width: 992px) {
+    .pattern-overlay.pattern-right {
+        display: none;
+
+    }
+
+    .search-block {
+        position: static;
+        margin-top: 0;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .hero-paragraph {
+        font-size: 1rem;
+    }
+}
