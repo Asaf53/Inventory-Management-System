@@ -56,7 +56,7 @@ if (!isset($_SESSION['user_id'])) {
                                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>" href="index.php" href="index.php">Dashboard</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'cars.php' ? 'active' : ''; ?>" href="cars.php" href="cars.php">Cars / Location</a>
+                                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'product.php' ? 'active' : ''; ?>" href="product.php" href="cars.php">Product / Type</a>
                                     </li>
 
                                     <li class="nav-item">
