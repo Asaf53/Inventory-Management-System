@@ -61,9 +61,9 @@ if (isset($_GET['action'])) {
                             <th scope="col" class="text-center">No.</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Type</th>
-                            <th scope="col" class="text-center">Length</th>
-                            <th scope="col" class="text-center">Height</th>
-                            <th scope="col" class="text-center">Width</th>
+                            <th scope="col" class="text-center">Length(m)</th>
+                            <th scope="col" class="text-center">Height(m)</th>
+                            <th scope="col" class="text-center">Width(m)</th>
                             <th scope="col">Description</th>
                             <th scope="col" class="text-center">Price</th>
                             <th scope="col" class="text-center">Qty</th>
@@ -99,8 +99,6 @@ if (isset($_GET['action'])) {
             </div>
         </div>
     </div>
-</div>
-</div>
 </div>
 <script src="js/jquery-3.3.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>

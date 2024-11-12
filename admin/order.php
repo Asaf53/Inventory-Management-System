@@ -15,49 +15,18 @@
 // $stm_bookings->execute();
 // $bookings = $stm_bookings->fetchAll(PDO::FETCH_ASSOC);
 
-if (isset($_GET['action']) && ($_GET['action'] === 'delete') && isset($_GET['type']) && ($_GET['type'] === 'rent')) {
-    if (isset($_GET['rent_id'])) {
-        $rent_id = $_GET['rent_id'];
-        $sql_delete_rent = "DELETE FROM `rental` WHERE id = ?";
-        $stm_delete_rent = $pdo->prepare($sql_delete_rent);
-        if ($stm_delete_rent->execute([$rent_id])) {
-            header('Location: index.php');
-        }
-    }
-}
-
-if (isset($_GET['action']) && ($_GET['action'] === 'status') && isset($_GET['type']) && ($_GET['type'] === 'rent')) {
-    if (isset($_GET['rent_id'])) {
-        $rent_id = $_GET['rent_id'];
-        $sql_update_rent = "UPDATE `rental` SET `status` = 'Confirmed' WHERE id = ?";
-        $stm_update_rent = $pdo->prepare($sql_update_rent);
-        if ($stm_update_rent->execute([$rent_id])) {
-            header('Location: index.php');
-        }
-    }
-}
+$sql_orders = "SELECT * FROM `orders` INNER JOIN `product` ON `orders`.`product_id` = `product`.`id`";
+$stm_orders = $pdo->prepare($sql_orders);
+$stm_orders->execute();
+$orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
 ?>
-<div class="row tm-content-row tm-mt-big mt-3">
-    <div class="col-xl-12 col-lg-12 tm-md-12 tm-sm-12 tm-col">
-        <div class="bg-white tm-block h-100">
-            <div class="row align-items-center justify-content-between">
-                <div class="col-md-8 col-4">
-                    <h2 class="tm-block-title d-inline-block mb-0">Products</h2>
-                </div>
-                <div class="col-md-4 col-8 d-flex justify-content-end">
-                    <a href="add-order.php" class="btn btn-small btn-primary">Add New Order</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <!-- row -->
-<!-- <div class="row tm-content-row mt-3">
+<div class="row tm-content-row mt-3">
     <div class="col-12">
         <div class="bg-white tm-block h-100">
             <div class="row">
                 <div class="col-8">
-                    <h2 class="tm-block-title d-inline-block">Bookings List</h2>
+                    <h2 class="tm-block-title d-inline-block">Order List</h2>
                 </div>
             </div>
             <div class="table-responsive text-nowrap">
@@ -65,42 +34,24 @@ if (isset($_GET['action']) && ($_GET['action'] === 'status') && isset($_GET['typ
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Book Number</th>
-                            <th scope="col">Customer</th>
-                            <th scope="col">Customer Email</th>
-                            <th scope="col">Customer Phone</th>
-                            <th scope="col">Car</th>
-                            <th scope="col">Pick Up Location</th>
-                            <th scope="col">Return Location</th>
-                            <th scope="col">Pick Up Date</th>
-                            <th scope="col">Return Date</th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Client Name</th>
+                            <th scope="col">Client Phone</th>
+                            <th scope="col">Qty</th>
                             <th scope="col">Total</th>
-                            <th scope="col">Status</th>
                             <th scope="col">Created at</th>
-                            <th scope="col" class="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $i = 1;
-                        foreach ($bookings as $book) : ?>
+                    <?php foreach ($orders as $i => $order) : ?>
                             <tr>
-                                <td><?= $i++ ?></td>
-                                <td><b><?= $book['rental_number'] ?></b></td>
-                                <td><?= $book['fullname'] ?></td>
-                                <td><?= $book['email'] ?></td>
-                                <td><?= $book['phone'] ?></td>
-                                <td><?= $book['make'] . " " . $book['model'] ?></td>
-                                <td><?= $book['pickup_location_name'] . " " . $book['pickup_location_address'] ?></td>
-                                <td><?= $book['return_location_name'] . " " . $book['return_location_address'] ?></td>
-                                <td><?= $book['start_date'] ?></td>
-                                <td><?= $book['end_date'] ?></td>
-                                <td><?= $book['total_cost'] ?>&euro;</td>
-                                <td><?= $book['status'] ?></td>
-                                <td><?= $book['created_at'] ?></td>
-                                <td class="text-center">
-                                    <a href="?action=status&type=rent&rent_id=<?= $book['rent_id'] ?>"><i class="fa fa-check text-success"></i></a>
-                                    <a href="?action=delete&type=rent&rent_id=<?= $book['rent_id'] ?>"><i class="fas fa-trash-alt text-danger"></i></a>
-                                </td>
+                                <td><?= $i + 1 ?></td>
+                                <td><?= $order['name'] ?></td>
+                                <td><?= $order['client_name'] ?></td>
+                                <td><?= $order['client_phone'] ?></td>
+                                <td><?= $order['order_date'] ?></td>
+                                <td><?= $order['price'] ?></td>
+                                <td><?= $order['qty'] ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -108,7 +59,7 @@ if (isset($_GET['action']) && ($_GET['action'] === 'status') && isset($_GET['typ
             </div>
         </div>
     </div>
-    <div class="tm-col tm-col-big">
+    <!-- <div class="tm-col tm-col-big">
         <div class="bg-white tm-block h-100">
             <div class="row">
                 <div class="col-8">
@@ -143,8 +94,8 @@ if (isset($_GET['action']) && ($_GET['action'] === 'status') && isset($_GET['typ
                 </li>
             </ol>
         </div>
-    </div>
-    <div class="tm-col tm-col-small">
+    </div> -->
+    <!-- <div class="tm-col tm-col-small">
         <div class="bg-white tm-block h-100">
             <h2 class="tm-block-title">Upcoming Tasks</h2>
             <ol class="tm-list-group">
@@ -162,8 +113,8 @@ if (isset($_GET['action']) && ($_GET['action'] === 'status') && isset($_GET['typ
                 <li class="tm-list-group-item">Company trip</li>
             </ol>
         </div>
-    </div>
-</div> -->
+    </div> -->
+</div>
 <script src="js/jquery-3.3.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.22.4/dist/bootstrap-table.min.js"></script>
