@@ -49,9 +49,9 @@ if (isset($_GET['action'])) {
         <div class="bg-white tm-block h-100">
             <div class="row">
                 <div class="col-12 col-md-8">
-                    <h2 class="tm-block-title d-inline-block">Products List</h2>
+                    <h2 class="tm-block-title d-inline-block align-items-center">Products List</h2>
                 </div>
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-md-4 d-flex justify-content-end align-items-center">
                     <a href="add-product.php" class="btn btn-small btn-primary">Add New Product</a>
                 </div>
             </div>
@@ -73,7 +73,7 @@ if (isset($_GET['action'])) {
                     </thead>
                     <tbody>
                         <?php foreach ($products as $i => $product) : ?>
-                            <tr>
+                            <tr class="<?= $product['qty'] < 10 ? 'bg-warning' : 'bg-white' ?>">
                                 <td class="text-center"><?= $i + 1 ?></td>
                                 <td class="tm-car-name"><?= $product['name'] ?></td>
                                 <td><?= $product['type'] ?></td>
