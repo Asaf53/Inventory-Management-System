@@ -6,6 +6,23 @@ $stm_orders->execute();
 $orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!-- row -->
+<?php
+if (isset($_GET['action'])) {
+    $alerts = [
+        'order_add' => 'Order added successfully',
+    ];
+    $alert = $alerts[$_GET['action']] ?? null;
+}
+?>
+<?php if (!empty($alert)) : ?>
+    <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+        <?= htmlspecialchars($alert) ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+<?php endif; ?>
+
 <div class="row tm-content-row mt-3">
     <div class="col-12">
         <div class="bg-white tm-block h-100">
