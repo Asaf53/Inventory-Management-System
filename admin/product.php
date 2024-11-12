@@ -43,21 +43,19 @@ if (isset($_GET['action'])) {
         </button>
     </div>
 <?php endif; ?>
-<div class="row tm-content-row tm-mt-big mt-3">
-    <div class="col-xl-12 col-lg-12 tm-md-12 tm-sm-12 tm-col">
+
+<div class="row tm-content-row mt-3">
+    <div class="col-12">
         <div class="bg-white tm-block h-100">
-            <div class="row align-items-center justify-content-between">
-                <div class="col-md-8 col-4">
-                    <h2 class="tm-block-title d-inline-block mb-0">Products</h2>
-                </div>
-                <div class="col-md-4 col-8 d-flex justify-content-end">
-                    <a href="add-product.php" class="btn btn-small btn-primary">Add New Product</a>
+            <div class="row">
+                <div class="col-8">
+                    <h2 class="tm-block-title d-inline-block">Products List</h2>
                 </div>
             </div>
             <div class="table-responsive text-nowrap">
-                <table class="table table-hover table-striped tm-table-striped-even mt-3">
+                <table class="table align-middle overflow-scroll" data-search-align="left" id="table" data-pagination="true" data-toggle="table" data-search="true" data-searchable="true">
                     <thead>
-                        <tr class="tm-bg-gray">
+                        <tr>
                             <th scope="col" class="text-center">No.</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Type</th>
@@ -102,6 +100,7 @@ if (isset($_GET['action'])) {
 </div>
 <script src="js/jquery-3.3.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.22.4/dist/bootstrap-table.min.js"></script>
 </body>
 
 </html>
