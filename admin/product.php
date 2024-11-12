@@ -48,12 +48,15 @@ if (isset($_GET['action'])) {
     <div class="col-12">
         <div class="bg-white tm-block h-100">
             <div class="row">
-                <div class="col-8">
+                <div class="col-12 col-md-8">
                     <h2 class="tm-block-title d-inline-block">Products List</h2>
+                </div>
+                <div class="col-12 col-md-4">
+                    <a href="add-product.php" class="btn btn-small btn-primary">Add New Product</a>
                 </div>
             </div>
             <div class="table-responsive text-nowrap">
-                <table class="table align-middle overflow-scroll" data-search-align="left" id="table" data-pagination="true" data-toggle="table" data-search="true" data-searchable="true">
+                <table class="table align-middle overflow-scroll col-12" data-search-align="left" id="table" data-pagination="true" data-toggle="table" data-search="true" data-searchable="true">
                     <thead>
                         <tr>
                             <th scope="col" class="text-center">No.</th>

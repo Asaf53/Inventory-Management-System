@@ -77,15 +77,15 @@ if (isset($_POST['edit_btn'], $_POST['csrf_token']) && $_POST['csrf_token'] === 
                                 </select>
                             </div>
                             <div class="input-group mb-3">
-                                <label for="length" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Length</label>
+                                <label for="length" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Length(m)</label>
                                 <input value="<?= $product['length'] ?>" id="length" name="length" type="number" class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7">
                             </div>
                             <div class="input-group mb-3">
-                                <label for="height" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Height</label>
+                                <label for="height" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Height(m)</label>
                                 <input value="<?= $product['height'] ?>" id="height" name="height" type="number" class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7" data-large-mode="true">
                             </div>
                             <div class="input-group mb-3">
-                                <label for="width" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Width</label>
+                                <label for="width" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Width(m)</label>
                                 <input value="<?= $product['width'] ?>" id="width" name="width" type="number" class="form-control validate col-xl-9 col-lg-8 col-md-7 col-sm-7">
                             </div>
                             <div class="input-group mb-3">
