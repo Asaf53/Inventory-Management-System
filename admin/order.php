@@ -1,20 +1,5 @@
 <?php include_once('includes/header.php');
 
-// $bookings = [];
-// $sql_bookings = "SELECT *, 
-// pickup_location.name AS pickup_location_name, 
-// pickup_location.address AS pickup_location_address, 
-// return_location.name AS return_location_name, 
-// return_location.address AS return_location_address, 
-// rental.id as rent_id FROM `rental` 
-// INNER JOIN `users` ON `rental`.`user_id` = `users`.`id` 
-// INNER JOIN `cars` ON `rental`.`car_id` = `cars`.`id`
-// INNER JOIN `locations` AS `pickup_location` ON `rental`.`pickup_location_id` = `pickup_location`.`id`
-// INNER JOIN `locations` AS `return_location` ON `rental`.`return_location_id` = `return_location`.`id`;";
-// $stm_bookings = $pdo->prepare($sql_bookings);
-// $stm_bookings->execute();
-// $bookings = $stm_bookings->fetchAll(PDO::FETCH_ASSOC);
-
 $sql_orders = "SELECT * FROM `orders` INNER JOIN `product` ON `orders`.`product_id` = `product`.`id`";
 $stm_orders = $pdo->prepare($sql_orders);
 $stm_orders->execute();
