@@ -1,6 +1,6 @@
 <?php include_once('includes/header.php');
 
-$sql_orders = "SELECT *, `orders`.`qty` AS `order_qty` FROM `orders` INNER JOIN `product` ON `orders`.`product_id` = `product`.`id`";
+$sql_orders = "SELECT *, `orders`.`qty` AS `order_qty`, `orders`.`price` AS `order_price` FROM `orders` INNER JOIN `product` ON `orders`.`product_id` = `product`.`id`";
 $stm_orders = $pdo->prepare($sql_orders);
 $stm_orders->execute();
 $orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
@@ -52,7 +52,7 @@ if (isset($_GET['action'])) {
                                 <td><?= $order['client_name'] ?></td>
                                 <td><?= $order['client_phone'] ?></td>
                                 <td><?= $order['order_qty'] ?></td>
-                                <td><?= $order['price'] ?></td>
+                                <td><?= $order['order_price'] ?></td>
                                 <td><?= $order['order_date'] ?></td>
                             </tr>
                         <?php endforeach; ?>

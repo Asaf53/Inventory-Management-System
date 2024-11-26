@@ -7,11 +7,9 @@ $stm_products = $pdo->prepare($sql_products);
 $stm_products->execute();
 $products = $stm_products->fetchAll(PDO::FETCH_ASSOC);
 
-foreach ($products as $product) {
-    if ($product['qty'] < 10) {
-        $add_order_errors[] = "Qty of product is lower than 10";
-    }
-}
+// foreach ($products as $product) {
+    
+// }
 
 if (isset($_POST['add_btn'])) {
     $product_id = $_POST['product_id'];
@@ -33,14 +31,71 @@ if (isset($_POST['add_btn'])) {
             $stm_update = $pdo->prepare($sql_update_qty);
             $stm_update->execute([$qty, $product_id]);
 
-            $sql_product = "SELECT `qty` FROM `product` WHERE `id` = ?";
-            $stm_product = $pdo->prepare($sql_product);
-            $stm_product->execute([$product_id]);
-            $product = $stm_product->fetch(PDO::FETCH_ASSOC);
+            $sql_product_qty = "SELECT `qty`, `name` FROM `product` WHERE `id` = ?";
+            $sql_product_qty = $pdo->prepare($sql_product_qty);
+            $sql_product_qty->execute([$product_id]);
+            $product_qty = $sql_product_qty->fetch(PDO::FETCH_ASSOC);
 
-            if ($product['qty'] < 10) {
+
+            if ($product_qty['qty'] < 10) {
                 $add_order_errors[] = "Qty of product is lower than 10";
+        
+                // API URL
+                $api_url = "https://graph.facebook.com/v21.0/482636938268759/messages";
+        
+                // Access token
+                $access_token = "EAAOkIcIDeIoBO5rQBZCVzSZADHYHIZBOfdJyqxHUDwtqwaut9TmuR30Pe0IieG1Q3rJ8NbYpsszV1ZCvW6b4pSuqW0vt7fR2ZBi5f7jJXZCNSCxGVKlTODNVDUGA8JzX8SsxCpfEQZAE2yCiFQTf4dcl1TZCanRVc0macW3bYjU9melQzNt7mLN0F9kmJC74m066hKcnwm9OjwJZArAtJZA13WM4LzGqsZD";
+        
+                // Recipient's phone number
+                $to = "38970832727";
+        
+                // Message payload for the custom template
+                $data = [
+                    "messaging_product" => "whatsapp",
+                    "to" => $to,
+                    "type" => "template",
+                    "template" => [
+                        "name" => "low_stock_alert", // Replace with your approved template name
+                        "language" => [
+                            "code" => "en"
+                        ],
+                        "components" => [
+                            [
+                                "type" => "body",
+                                "parameters" => [
+                                    ["type" => "text", "text" => $product_qty['name']], // Placeholder {{1}}
+                                    ["type" => "text", "text" => (string)$product_qty['qty']] // Placeholder {{2}}
+                                ]
+                            ]
+                        ]
+                    ]
+                ];
+        
+                // Initialize cURL
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $api_url);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    "Authorization: Bearer $access_token",
+                    "Content-Type: application/json"
+                ]);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        
+                // Execute the request
+                $response = curl_exec($ch);
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
+                // Check response
+                if ($http_code === 200) {
+                    echo "WhatsApp alert message sent successfully.";
+                } else {
+                    echo "Failed to send WhatsApp alert message. Response: " . $response;
+                }
+        
+                curl_close($ch);
             }
+
 
             header("Location: order.php?action=order_add");
         } else {
