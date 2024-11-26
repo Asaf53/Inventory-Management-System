@@ -18,6 +18,15 @@ if (isset($_POST['add_btn'])) {
     $price = $_POST['price'];
     $qty = $_POST['qty'];
 
+    $sql_product = "SELECT `qty`, `name` FROM `product` WHERE `id` = ?";
+    $sql_product = $pdo->prepare($sql_product);
+    $sql_product->execute([$product_id]);
+    $sql_product = $sql_product->fetch(PDO::FETCH_ASSOC);
+
+    if ($sql_product['qty'] < 10) {
+        $add_order_errors[] = "Qty of product is lower than 10";
+    }
+
     if (empty($product_id) || empty($client_name) || empty($client_phone) || empty($price) || empty($qty)) {
         $add_order_errors[] = "Please fill in all the fields.";
     }
@@ -36,15 +45,19 @@ if (isset($_POST['add_btn'])) {
             $sql_product_qty->execute([$product_id]);
             $product_qty = $sql_product_qty->fetch(PDO::FETCH_ASSOC);
 
-
             if ($product_qty['qty'] < 10) {
                 $add_order_errors[] = "Qty of product is lower than 10";
+
+                $sql_access_token = "SELECT `bearer` FROM `system`";
+                $sql_access_token = $pdo->prepare($sql_access_token);
+                $sql_access_token->execute();
+                $access_token = $sql_access_token->fetch(PDO::FETCH_ASSOC);
         
                 // API URL
                 $api_url = "https://graph.facebook.com/v21.0/482636938268759/messages";
         
                 // Access token
-                $access_token = "EAAOkIcIDeIoBO5rQBZCVzSZADHYHIZBOfdJyqxHUDwtqwaut9TmuR30Pe0IieG1Q3rJ8NbYpsszV1ZCvW6b4pSuqW0vt7fR2ZBi5f7jJXZCNSCxGVKlTODNVDUGA8JzX8SsxCpfEQZAE2yCiFQTf4dcl1TZCanRVc0macW3bYjU9melQzNt7mLN0F9kmJC74m066hKcnwm9OjwJZArAtJZA13WM4LzGqsZD";
+                $access_token = $access_token['bearer'];
         
                 // Recipient's phone number
                 $to = "38970832727";
@@ -55,9 +68,9 @@ if (isset($_POST['add_btn'])) {
                     "to" => $to,
                     "type" => "template",
                     "template" => [
-                        "name" => "low_stock_alert", // Replace with your approved template name
+                        "name" => "low_stock_alert_titan_cink", // Replace with your approved template name
                         "language" => [
-                            "code" => "en"
+                            "code" => "en_US"
                         ],
                         "components" => [
                             [
