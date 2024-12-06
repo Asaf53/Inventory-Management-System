@@ -36,64 +36,63 @@ if (isset($_GET['action'])) {
 }
 ?>
 <?php if (!empty($alert)) : ?>
-    <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
-        <?= htmlspecialchars($alert) ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+<div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+    <?= htmlspecialchars($alert) ?>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
 <?php endif; ?>
 
-<div class="row tm-content-row mt-3">
+<div class="container-fluid mt-3">
     <div class="col-12">
-        <div class="bg-white tm-block h-100">
-            <div class="row">
-                <div class="col-12 col-md-8">
-                    <h2 class="tm-block-title d-inline-block align-items-center">Products List</h2>
+        <div class="bg-white">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-6 col-md-8">
+                    <h2>Products List</h2>
                 </div>
-                <div class="col-12 col-md-4 d-flex justify-content-end align-items-center">
+                <div class="col-6 col-md-4 d-flex justify-content-end align-items-center">
                     <a href="add-product.php" class="btn btn-small btn-primary">Add New Product</a>
                 </div>
             </div>
-            <div class="table-responsive text-nowrap">
-                <table class="table align-middle overflow-scroll col-12" data-search-align="left" id="table" data-pagination="true" data-toggle="table" data-search="true" data-searchable="true">
+            <div class="table-responsive text-nowrap mt-3">
+                <table class="table table-striped align-middle overflow-scroll col-12" id="table" data-search-align="left"
+                    data-pagination="true" data-toggle="table" data-search="true" data-searchable="true">
                     <thead>
                         <tr>
                             <th scope="col" class="text-center">No.</th>
-                            <th scope="col">Product Name</th>
-                            <th scope="col">Type</th>
-                            <th scope="col" class="text-center">Length(m)</th>
-                            <th scope="col" class="text-center">Height(m)</th>
-                            <th scope="col" class="text-center">Width(m)</th>
-                            <th scope="col">Description</th>
-                            <th scope="col" class="text-center">Price</th>
-                            <th scope="col" class="text-center">Qty</th>
+                            <th scope="col" class="text-center">Product Name</th>
+                            <th scope="col" class="text-center" data-sortable="true">Type</th>
+                            <th scope="col" class="text-center" data-sortable="true">Length(m)</th>
+                            <th scope="col" class="text-center" data-sortable="true">Qty</th>
                             <th scope="col" class="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($products as $i => $product) : ?>
-                            <tr class="<?= $product['qty'] < 10 ? 'bg-warning' : 'bg-white' ?>">
-                                <td class="text-center"><?= $i + 1 ?></td>
-                                <td class="tm-car-name"><?= $product['name'] ?></td>
-                                <td><?= $product['type'] ?></td>
-                                <td class="text-center"><?= $product['length'] ?></td>
-                                <td class="text-center"><?= $product['height'] ?></td>
-                                <td class="text-center"><?= $product['width'] ?></td>
-                                <td><?= $product['description'] ?></td>
-                                <td class="text-center"><?= $product['price'] ?></td>
-                                <td class="text-center"><?= $product['qty'] ?></td>
-                                <td class="text-center">
-                                    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post" style="display:inline;">
+                        <tr class="<?= $product['qty'] < 10 ? 'bg-warning' : 'bg-white' ?>">
+                            <td class="text-center"><?= $i + 1 ?></td>
+                            <td class="text-center"><?= $product['name'] ?></td>
+                            <td class="text-center"><?= $product['type'] ?></td>
+                            <td class="text-center"><?= $product['length'] ?></td>
+                            <td class="text-center"><?= $product['qty'] ?></td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post"
+                                        style="display:inline;">
                                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                         <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                                        <button type="submit" name="delete_btn" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to delete this product?');">
-                                            <i class="fas fa-trash-alt tm-trash-icon"></i>
+                                        <button type="submit" name="delete_btn" class="btn btn-link p-0"
+                                            onclick="return confirm('Are you sure you want to delete this product?');">
+                                            <i class="bx bx-trash text-danger h3 m-0"></i>
                                         </button>
                                     </form>
-                                    <a href="edit-product.php?product_id=<?= $product['id'] ?>&token=<?= $_SESSION['csrf_token'] ?>"><i class="fas fa-edit tm-trash-icon"></i></a>
-                                </td>
-                            </tr>
+                                    <a
+                                        href="edit-product.php?product_id=<?= $product['id'] ?>&token=<?= $_SESSION['csrf_token'] ?>"><i
+                                            class="bx bx-edit text-warning h3 m-0"></i></a>
+                                </div>
+                            </td>
+                        </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -101,9 +100,9 @@ if (isset($_GET['action'])) {
         </div>
     </div>
 </div>
-<script src="js/jquery-3.3.1.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.22.4/dist/bootstrap-table.min.js"></script>
+<script src="assets/js/jquery-1.11.0.min.js"></script>
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.5/dist/bootstrap-table.min.js"></script>
 </body>
 
 </html>
