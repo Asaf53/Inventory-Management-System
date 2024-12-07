@@ -44,7 +44,132 @@ if (isset($_GET['action'])) {
 </div>
 <?php endif; ?>
 
-<div class="container-fluid mt-3">
+<div class="container-fluid">
+    <div class="row mt-4 col-12 justify-content-center p-0 m-0">
+        <div class="col-12 col-md-4 col-xl-2 m-2">
+            <a href="#" class="text-decoration-none">
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
+                                <h6 class="card-title text-white m-0 ms-1">Sandwich Panel 5cm</h6>
+                            </div>
+                            <h6 class="card-text text-white m-0">776</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4 col-xl-2 m-2">
+            <a href="#" class="text-decoration-none">
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
+                                <h6 class="card-title text-white m-0 ms-1">Sandwich Panel 5cm</h6>
+                            </div>
+                            <h6 class="card-text text-white m-0">776</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4 col-xl-2 m-2">
+            <a href="#" class="text-decoration-none">
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
+                                <h6 class="card-title text-white m-0 ms-1">Sandwich Panel 5cm</h6>
+                            </div>
+                            <h6 class="card-text text-white m-0">776</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4 col-xl-2 m-2">
+            <a href="#" class="text-decoration-none">
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
+                                <h6 class="card-title text-white m-0 ms-1">Sandwich Panel 5cm</h6>
+                            </div>
+                            <h6 class="card-text text-white m-0">776</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4 col-xl-2 m-2">
+            <a href="#" class="text-decoration-none">
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
+                                <h6 class="card-title text-white m-0 ms-1">Sandwich Panel 5cm</h6>
+                            </div>
+                            <h6 class="card-text text-white m-0">776</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4 col-xl-2 m-2">
+            <a href="#" class="text-decoration-none">
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
+                                <h6 class="card-title text-white m-0 ms-1">Sandwich Panel 5cm</h6>
+                            </div>
+                            <h6 class="card-text text-white m-0">776</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4 col-xl-2 m-2">
+            <a href="#" class="text-decoration-none">
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
+                                <h6 class="card-title text-white m-0 ms-1">Sandwich Panel 5cm</h6>
+                            </div>
+                            <h6 class="card-text text-white m-0">776</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4 col-xl-2 m-2">
+            <a href="#" class="text-decoration-none">
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
+                                <h6 class="card-title text-white m-0 ms-1">Sandwich Panel 5cm</h6>
+                            </div>
+                            <h6 class="card-text text-white m-0">776</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- <div class="container-fluid mt-3">
     <div class="col-12">
         <div class="bg-white">
             <div class="row align-items-center justify-content-center">
@@ -99,7 +224,7 @@ if (isset($_GET['action'])) {
             </div>
         </div>
     </div>
-</div>
+</div> -->
 <script src="assets/js/jquery-1.11.0.min.js"></script>
 <script src="assets/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.5/dist/bootstrap-table.min.js"></script>
