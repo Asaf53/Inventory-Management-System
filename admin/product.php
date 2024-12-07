@@ -45,8 +45,12 @@ if (isset($_GET['action'])) {
 <?php endif; ?>
 
 <div class="container-fluid">
-    <div class="row mt-4 col-12 justify-content-center p-0 m-0">
-        <div class="col-12 col-md-4 col-xl-2 m-2">
+    <div class="row mt-4 col-12 justify-content-start p-0 m-0">
+        <div class="col-12 d-flex justify-content-start mb-2">
+            <a href="#" class="btn btn-small btn-primary d-flex justify-content-between align-items-center"> <img
+                    src="./assets/icons/folder-plus.svg" alt="">Add New Category</a>
+        </div>
+        <div class="col-12 col-md-4 col-xl-2 mb-2">
             <a href="#" class="text-decoration-none">
                 <div class="card bg-secondary">
                     <div class="card-body">
@@ -61,7 +65,7 @@ if (isset($_GET['action'])) {
                 </div>
             </a>
         </div>
-        <div class="col-12 col-md-4 col-xl-2 m-2">
+        <div class="col-12 col-md-4 col-xl-2 mb-2">
             <a href="#" class="text-decoration-none">
                 <div class="card bg-secondary">
                     <div class="card-body">
@@ -76,7 +80,7 @@ if (isset($_GET['action'])) {
                 </div>
             </a>
         </div>
-        <div class="col-12 col-md-4 col-xl-2 m-2">
+        <div class="col-12 col-md-4 col-xl-2 mb-2">
             <a href="#" class="text-decoration-none">
                 <div class="card bg-secondary">
                     <div class="card-body">
@@ -91,7 +95,7 @@ if (isset($_GET['action'])) {
                 </div>
             </a>
         </div>
-        <div class="col-12 col-md-4 col-xl-2 m-2">
+        <div class="col-12 col-md-4 col-xl-2 mb-2">
             <a href="#" class="text-decoration-none">
                 <div class="card bg-secondary">
                     <div class="card-body">
@@ -106,7 +110,7 @@ if (isset($_GET['action'])) {
                 </div>
             </a>
         </div>
-        <div class="col-12 col-md-4 col-xl-2 m-2">
+        <div class="col-12 col-md-4 col-xl-2 mb-2">
             <a href="#" class="text-decoration-none">
                 <div class="card bg-secondary">
                     <div class="card-body">
@@ -121,7 +125,7 @@ if (isset($_GET['action'])) {
                 </div>
             </a>
         </div>
-        <div class="col-12 col-md-4 col-xl-2 m-2">
+        <div class="col-12 col-md-4 col-xl-2 mb-2">
             <a href="#" class="text-decoration-none">
                 <div class="card bg-secondary">
                     <div class="card-body">
@@ -136,7 +140,7 @@ if (isset($_GET['action'])) {
                 </div>
             </a>
         </div>
-        <div class="col-12 col-md-4 col-xl-2 m-2">
+        <div class="col-12 col-md-4 col-xl-2 mb-2">
             <a href="#" class="text-decoration-none">
                 <div class="card bg-secondary">
                     <div class="card-body">
@@ -151,7 +155,7 @@ if (isset($_GET['action'])) {
                 </div>
             </a>
         </div>
-        <div class="col-12 col-md-4 col-xl-2 m-2">
+        <div class="col-12 col-md-4 col-xl-2 mb-2">
             <a href="#" class="text-decoration-none">
                 <div class="card bg-secondary">
                     <div class="card-body">

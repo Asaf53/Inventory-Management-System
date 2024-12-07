@@ -79,7 +79,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="productQuantity" class="form-label">Set Quantity</label>
-                            <input type="number" class="form-control" id="productQuantity" placeholder="0.0">
+                            <input type="number" class="form-control" id="productQuantity">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -115,7 +115,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="productQuantity" class="form-label">Set Quantity</label>
-                            <input type="number" class="form-control" id="productQuantity" placeholder="0.0">
+                            <input type="number" class="form-control" id="productQuantity">
                         </div>
                     </div>
                     <div class="modal-footer">
