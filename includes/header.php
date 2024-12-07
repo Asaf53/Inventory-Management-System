@@ -3,13 +3,26 @@ session_start();
 include_once('database.php');
 
 
-if (isset($_GET['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_GET['csrf_token'])) {
-    unset($_SESSION['is_loggedin']);
-    unset($_SESSION['user_id']);
-    unset($_SESSION['email']);
-    unset($_SESSION['fullname']);
-    unset($_SESSION['csrf_token']);
-    header("Location: index.php");
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
+    // Validate CSRF token
+    if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        // Clear session variables
+        session_unset();
+        session_destroy();
+
+        // Clear cookies (if login persistence was implemented)
+        if (isset($_COOKIE['login_token'])) {
+            setcookie('login_token', '', time() - 3600, "/");
+        }
+
+        // Redirect to the homepage
+        header("Location: index.php?logout=success");
+        exit();
+    } else {
+        // Invalid CSRF token
+        header("Location: index.php?error=csrf");
+        exit();
+    }
 }
 ?>
 
@@ -32,25 +45,35 @@ if (isset($_GET['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_GET['cs
     <nav class="navbar navbar-expand-md px-lg-5 p-3 bg-white text-danger">
         <div class="container">
             <a class="navbar-brand" href="index.php">Titan Cink</a>
-            <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false"
+                aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="navbar-collapse collapse" id="navbarToggler">
                 <div class="ms-auto">
                     <?php if (!isset($_SESSION['is_loggedin'])) : ?>
-                        <ul class="navbar-nav mb-lg-0 d-flex flex-row align-items-center justify-content-center">
-                            <li class="nav-item me-3"><a class="nav-link" href="index.php">Login</a></li>
-                            <li class="nav-item"><a class="nav-link border border-outline-primary rounded-0 py-2 px-3" href="register.php">Sign In</a></li>
-                        </ul>
+                    <ul class="navbar-nav mb-lg-0 d-flex flex-row align-items-center justify-content-center">
+                        <li class="nav-item me-3"><a class="nav-link" href="index.php">Login</a></li>
+                        <li class="nav-item"><a class="nav-link border border-outline-primary rounded-0 py-2 px-3"
+                                href="register.php">Sign In</a></li>
+                    </ul>
                     <?php else : ?>
-                        <div class="dropdown-center bg-white shadow-sm p-2 rounded-5">
-                            <button class="btn btn-transparent m-0 p-0 border-0 d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bx bx-user mb-0 pb-0 h3"></i>
-                            </button>
-                            <ul class="dropdown-menu mb-0 pb-0">
-                                <li><a class="dropdown-item" href="?csrf_token=<?php echo $_SESSION['csrf_token']; ?>">Logout</a></li>
-                            </ul>
-                        </div>
+                    <div class="dropdown-center bg-white shadow-sm p-2 rounded-5">
+                        <button class="btn btn-transparent m-0 p-0 border-0 d-flex align-items-center" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bx bx-user mb-0 pb-0 h3"></i>
+                        </button>
+                        <ul class="dropdown-menu mb-0 pb-0">
+                            <li>
+                                <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+                                    <input type="hidden" name="csrf_token"
+                                        value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+                                    <button type="submit" class="dropdown-item">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
                     <?php endif; ?>
                 </div>
             </div>

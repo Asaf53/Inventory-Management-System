@@ -1,17 +1,32 @@
 <?php
 session_start();
 include_once('database.php');
-if (isset($_GET['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_GET['csrf_token'])) {
-    unset($_SESSION['is_loggedin']);
-    unset($_SESSION['user_id']);
-    unset($_SESSION['email']);
-    unset($_SESSION['fullname']);
-    unset($_SESSION['csrf_token']);
-    header("Location: ../index.php");
+
+if (!isset($_SESSION['is_loggedin']) && ($_SESSION['role'] !== 'admin')) {
+    header('Location: error.html');
 }
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ../index.php');
-    die();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
+    // Validate CSRF token
+    if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        
+        // Clear cookies (if login persistence was implemented)
+        if (isset($_COOKIE['login_token'])) {
+            setcookie('login_token', '', time() - 3600, "/");
+        }
+        
+        // Clear session variables
+        session_unset();
+        session_destroy();
+
+        // Redirect to the homepage
+        header("Location: ../index.php?logout=success");
+        exit();
+    } else {
+        // Invalid CSRF token
+        header("Location: ../index.php?error=csrf");
+        exit();
+    }
 }
 ?>
 
@@ -32,10 +47,6 @@ if (!isset($_SESSION['user_id'])) {
 
 
 <body>
-    <?php if (isset($_SESSION['role']) && ($_SESSION['role'] !== 'admin')) {
-        header('Location: error.html');
-        die();
-    } else { ?>
     <nav class="navbar navbar-expand-lg bg-primary">
         <div class="container-fluid py-2">
             <a class="navbar-brand text-light" href="index.php">Dashboard</a>
@@ -53,14 +64,14 @@ if (!isset($_SESSION['user_id'])) {
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="btn btn-outline-light d-flex align-items-center"
-                            href="?csrf_token=<?php echo $_SESSION['csrf_token']; ?>">
-                            <i class='bx bx-user me-1 h4 p-0 m-0'></i>
-                            <span>Logout</span>
-                        </a>
+
+                        <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+                            <input type="hidden" name="csrf_token"
+                                value="<?php echo $_SESSION['csrf_token']; ?>">
+                            <button type="submit" class="btn btn-outline-light">Logout</button>
+                        </form>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-    <?php }; ?>
