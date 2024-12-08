@@ -1,6 +1,6 @@
 <?php
 $host = '127.0.0.1';
-$db = 'titan-cink';
+$db = 'test_titan_cink';
 $dsn = "mysql:host=$host;dbname=$db;";
 $username = 'root';
 $password = '';

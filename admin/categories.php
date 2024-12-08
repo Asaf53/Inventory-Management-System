@@ -1,9 +1,16 @@
 <?php include_once('includes/header.php');
 
-$sql_categories = "SELECT * FROM `categories`";
-$stm_categories = $pdo->prepare($sql_categories);
-$stm_categories->execute();
-$categories = $stm_categories->fetchAll(PDO::FETCH_ASSOC);
+$category_products = [];
+if(isset($_GET['category_id'])){
+    $category_id = $_GET['category_id'];
+    $sql_category_products = 
+    "SELECT *, `products`.`name` as `product_name`, `inventorysummary`.`current_qty` as `product_qty` FROM `products` 
+    INNER JOIN `categories` ON `products`.`category_id` = `categories`.`id`
+    INNER JOIN `inventorysummary` ON `products`.`id` = `inventorysummary`.`product_id` WHERE `products`.`category_id` = $category_id";
+    $stm_category_products = $pdo->prepare($sql_category_products);
+    $stm_category_products->execute();
+    $category_products = $stm_category_products->fetchAll(PDO::FETCH_ASSOC);
+}
 
 // Process Delete Request
 // if (isset($_POST['delete_btn'], $_POST['product_id'], $_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
@@ -44,33 +51,7 @@ if (isset($_GET['action'])) {
 </div>
 <?php endif; ?>
 
-<div class="container-fluid">
-    <div class="row mt-4 col-12 justify-content-start p-0 m-0">
-        <div class="col-12 d-flex justify-content-start mb-2">
-            <a href="#" class="btn btn-small btn-primary d-flex justify-content-between align-items-center"> <img
-                    src="./assets/icons/folder-plus.svg" alt="">Add New Category</a>
-        </div>
-        <?php foreach ($categories as $category): ?>
-        <div class="col-12 col-md-4 col-xl-2 mb-2">
-            <a href="categories.php?category_id=<?= $category['id'] ?>" class="text-decoration-none">
-                <div class="card bg-secondary">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
-                                <h6 class="card-title text-white m-0 ms-1"><?= $category['name'] ?></h6>
-                            </div>
-                            <h6 class="card-text text-white m-0">776</h6>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <?php endforeach; ?>
-    </div>
-</div>
-
-<!-- <div class="container-fluid mt-3">
+<div class="container-fluid mt-3">
     <div class="col-12">
         <div class="bg-white">
             <div class="row align-items-center justify-content-center">
@@ -82,26 +63,25 @@ if (isset($_GET['action'])) {
                 </div>
             </div>
             <div class="table-responsive text-nowrap mt-3">
-                <table class="table table-striped align-middle overflow-scroll col-12" id="table" data-search-align="left"
-                    data-pagination="true" data-toggle="table" data-search="true" data-searchable="true">
+                <table class="table table-striped align-middle overflow-scroll col-12" id="table"
+                    data-search-align="left" data-pagination="true" data-toggle="table" data-search="true"
+                    data-searchable="true">
                     <thead>
                         <tr>
                             <th scope="col" class="text-center">No.</th>
                             <th scope="col" class="text-center">Product Name</th>
-                            <th scope="col" class="text-center" data-sortable="true">Type</th>
                             <th scope="col" class="text-center" data-sortable="true">Length(m)</th>
                             <th scope="col" class="text-center" data-sortable="true">Qty</th>
                             <th scope="col" class="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($products as $i => $product) : ?>
-                        <tr class="<?= $product['qty'] < 10 ? 'bg-warning' : 'bg-white' ?>">
+                        <?php foreach ($category_products as $i => $product): ?>
+                        <tr class="<?= $product['product_qty'] < 10 ? 'bg-warning' : 'bg-white' ?>">
                             <td class="text-center"><?= $i + 1 ?></td>
-                            <td class="text-center"><?= $product['name'] ?></td>
-                            <td class="text-center"><?= $product['type'] ?></td>
+                            <td class="text-center"><?= $product['product_name'] ?></td>
                             <td class="text-center"><?= $product['length'] ?></td>
-                            <td class="text-center"><?= $product['qty'] ?></td>
+                            <td class="text-center"><?= $product['product_qty'] ?></td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center align-items-center">
                                     <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post"
@@ -125,7 +105,7 @@ if (isset($_GET['action'])) {
             </div>
         </div>
     </div>
-</div> -->
+</div>
 <script src="assets/js/jquery-1.11.0.min.js"></script>
 <script src="assets/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.5/dist/bootstrap-table.min.js"></script>
