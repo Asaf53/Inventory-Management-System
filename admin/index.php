@@ -1,6 +1,131 @@
 <?php include_once('includes/header.php'); ?>
 
+<?php
+
+// Query to fetch categories and products
+$query = "
+    SELECT 
+        categories.id AS category_id, 
+        categories.name AS category_name, 
+        products.id AS product_id, 
+        products.name AS product_name 
+    FROM categories 
+    LEFT JOIN products ON categories.id = products.category_id
+    ORDER BY categories.name, products.name;
+";
+
+// Prepare and execute the query
+$stmt = $pdo->prepare($query);
+$stmt->execute();
+
+// Fetch all results as an associative array
+$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Organize data into categories and products
+$data = [];
+foreach ($results as $row) {
+    $category_name = $row['category_name'];
+    $product_id = $row['product_id'];
+    $product_name = $row['product_name'];
+
+    // Initialize the category array if not already set
+    if (!isset($data[$category_name])) {
+        $data[$category_name] = [];
+    }
+
+    // Add the product id and name to the category if it exists
+    if ($product_name) {
+        $data[$category_name][] = [
+            'id' => $product_id,
+            'name' => $product_name,
+        ];
+    }
+}
+
+// Output $data structure if needed for debugging
+// print_r($data);
+
+
+$transaction_product_errors = [];
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || isset($_POST['incoming_btn']))) {
+    $product_id = $_POST['product_id'];
+    $new_quantity = $_POST['new_quantity'];
+    $transaction_type = $_POST['transaction_type']; // 'incoming' or 'outgoing'
+
+    if (empty($product_id) || empty($new_quantity) || empty($transaction_type)) {
+        $transaction_product_errors[] = "Please fill in all the fields.";
+    } else {
+        // Get the current quantity from InventorySummary
+        $currentQtySql = "SELECT current_qty FROM InventorySummary WHERE product_id = ?";
+        $stmt = $pdo->prepare($currentQtySql);
+        $stmt->execute([$product_id]);
+
+        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $current_qty = $row['current_qty'];
+
+            // Update the quantity based on transaction type
+            switch ($transaction_type) {
+                case 'incoming':
+                    $updated_qty = $current_qty + $new_quantity;
+                    break;
+                case 'outgoing':
+                    if ($new_quantity > $current_qty) {
+                        $transaction_product_errors[] = "Error: Insufficient stock for this operation.";
+                    } else {
+                        $updated_qty = $current_qty - $new_quantity;
+                    }
+                    break;
+                default:
+                    $transaction_product_errors[] = "Invalid transaction type.";
+            }
+
+            // Proceed only if there are no errors
+            if (empty($transaction_product_errors)) {
+                // Update InventorySummary
+                $updateQtySql = "UPDATE InventorySummary SET current_qty = ? WHERE product_id = ?";
+                $updateStmt = $pdo->prepare($updateQtySql);
+
+                if ($updateStmt->execute([$updated_qty, $product_id])) {
+                    // Log the transaction in Transactions table
+                    $insertTransactionSql = "INSERT INTO Transactions (product_id, type, quantity) VALUES (?, ?, ?)";
+                    $transactionStmt = $pdo->prepare($insertTransactionSql);
+                    $transactionStmt->execute([$product_id, $transaction_type, $new_quantity]);
+
+                    echo "Product quantity updated successfully!";
+                    header("Location: index.php?action=product_qty&status=success");
+                } else {
+                    $transaction_product_errors[] = "Error updating quantity.";
+                }
+            }
+        } else {
+            $transaction_product_errors[] = "Product not found.";
+        }
+    }
+}
+?>
+<?php
+if (isset($_GET['action']) && isset($_GET['status'])) {
+    $alerts = [
+        'product_qty' => [
+            'success' => 'Product quantity updated successfully!',
+            'error' => 'Failed to update product quantity.',
+        ],
+    ];
+
+    // Get the appropriate alert based on action and status
+    $action = $_GET['action'];
+    $status = $_GET['status'];
+
+    $alert = $alerts[$action][$status] ?? null;
+}
+?>
 <div class="container-fluid">
+    <?php if (!empty($alert)) : ?>
+        <div class="alert alert-<?= htmlspecialchars($status) === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show mt-3" role="alert">
+            <strong class="text-uppercase me-1"><?= htmlspecialchars($status) ?>!</strong><?= htmlspecialchars($alert) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
     <div class="row mt-4 col-12 justify-content-center p-0 m-0">
         <div class="col-12 col-md-4 col-xl-4 m-2">
             <a href="product.php" class="text-decoration-none">
@@ -62,29 +187,31 @@
                     <h1 class="modal-title fs-5" id="packageMinusLabel">Modal title</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form>
+                <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="categoryProductSelect" class="form-label">Select Product</label>
-                            <select class="form-select" id="categoryProductSelect">
+                            <select class="form-select" id="categoryProductSelect" name="product_id">
                                 <?php foreach ($data as $category => $products): ?>
-                                <optgroup label="<?= htmlspecialchars($category) ?>">
-                                    <?php foreach ($products as $product): ?>
-                                    <option value="<?= htmlspecialchars($product) ?>"><?= htmlspecialchars($product) ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                </optgroup>
+                                    <optgroup label="<?= htmlspecialchars($category) ?>">
+                                        <?php foreach ($products as $product): ?>
+                                            <option value="<?= htmlspecialchars($product['id']) ?>">
+                                                <?= htmlspecialchars($product['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="productQuantity" class="form-label">Set Quantity</label>
-                            <input type="number" class="form-control" id="productQuantity">
+                            <input type="number" name="new_quantity" class="form-control">
+                            <input type="hidden" name="transaction_type" value="outgoing">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" name="outgoing_btn" class="btn btn-primary">Save changes</button>
                     </div>
                 </form>
             </div>
@@ -98,29 +225,31 @@
                     <h1 class="modal-title fs-5" id="packagePlusLabel">Modal title</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form>
+                <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="categoryProductSelect" class="form-label">Select Product</label>
-                            <select class="form-select" id="categoryProductSelect">
+                            <select class="form-select" id="categoryProductSelect" name="product_id">
                                 <?php foreach ($data as $category => $products): ?>
-                                <optgroup label="<?= htmlspecialchars($category) ?>">
-                                    <?php foreach ($products as $product): ?>
-                                    <option value="<?= htmlspecialchars($product) ?>"><?= htmlspecialchars($product) ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                </optgroup>
+                                    <optgroup label="<?= htmlspecialchars($category) ?>">
+                                        <?php foreach ($products as $product): ?>
+                                            <option value="<?= htmlspecialchars($product['id']) ?>">
+                                                <?= htmlspecialchars($product['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="productQuantity" class="form-label">Set Quantity</label>
-                            <input type="number" class="form-control" id="productQuantity">
+                            <input type="number" name="new_quantity" class="form-control">
+                            <input type="hidden" name="transaction_type" value="incoming">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" name="incoming_btn" class="btn btn-primary">Save changes</button>
                     </div>
                 </form>
             </div>

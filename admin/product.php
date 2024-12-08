@@ -44,6 +44,7 @@ if (isset($_GET['action'])) {
 </div>
 <?php endif; ?>
 
+<button onclick="history.back()" class="btn btn-transparent d-flex justify-content-between align-items-center"><img src="./assets/icons/back.svg" alt=""> Back</button>
 <div class="container-fluid">
     <div class="row mt-4 col-12 justify-content-start p-0 m-0">
         <div class="col-12 d-flex justify-content-start mb-2">

@@ -1,10 +1,10 @@
 <?php include_once('includes/header.php');
 
 $category_products = [];
-if(isset($_GET['category_id'])){
+if (isset($_GET['category_id'])) {
     $category_id = $_GET['category_id'];
-    $sql_category_products = 
-    "SELECT *, `products`.`name` as `product_name`, `inventorysummary`.`current_qty` as `product_qty` FROM `products` 
+    $sql_category_products =
+        "SELECT *, `products`.`name` as `product_name`, `inventorysummary`.`current_qty` as `product_qty` FROM `products` 
     INNER JOIN `categories` ON `products`.`category_id` = `categories`.`id`
     INNER JOIN `inventorysummary` ON `products`.`id` = `inventorysummary`.`product_id` WHERE `products`.`category_id` = $category_id";
     $stm_category_products = $pdo->prepare($sql_category_products);
@@ -43,14 +43,15 @@ if (isset($_GET['action'])) {
 }
 ?>
 <?php if (!empty($alert)) : ?>
-<div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
-    <?= htmlspecialchars($alert) ?>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
+    <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+        <?= htmlspecialchars($alert) ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
 <?php endif; ?>
 
+<button onclick="history.back()" class="btn btn-transparent d-flex justify-content-between align-items-center"><img src="./assets/icons/back.svg" alt=""> Back</button>
 <div class="container-fluid mt-3">
     <div class="col-12">
         <div class="bg-white">
@@ -77,28 +78,28 @@ if (isset($_GET['action'])) {
                     </thead>
                     <tbody>
                         <?php foreach ($category_products as $i => $product): ?>
-                        <tr class="<?= $product['product_qty'] < 10 ? 'bg-warning' : 'bg-white' ?>">
-                            <td class="text-center"><?= $i + 1 ?></td>
-                            <td class="text-center"><?= $product['product_name'] ?></td>
-                            <td class="text-center"><?= $product['length'] ?></td>
-                            <td class="text-center"><?= $product['product_qty'] ?></td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center align-items-center">
-                                    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post"
-                                        style="display:inline;">
-                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                                        <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                                        <button type="submit" name="delete_btn" class="btn btn-link p-0"
-                                            onclick="return confirm('Are you sure you want to delete this product?');">
-                                            <i class="bx bx-trash text-danger h3 m-0"></i>
-                                        </button>
-                                    </form>
-                                    <a
-                                        href="edit-product.php?product_id=<?= $product['id'] ?>&token=<?= $_SESSION['csrf_token'] ?>"><i
-                                            class="bx bx-edit text-warning h3 m-0"></i></a>
-                                </div>
-                            </td>
-                        </tr>
+                            <tr class="<?= $product['product_qty'] < 10 ? 'bg-warning' : 'bg-white' ?>">
+                                <td class="text-center"><?= $i + 1 ?></td>
+                                <td class="text-center"><?= $product['product_name'] ?></td>
+                                <td class="text-center"><?= $product['length'] ?></td>
+                                <td class="text-center"><?= $product['product_qty'] ?></td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post"
+                                            style="display:inline;">
+                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                            <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                            <button type="submit" name="delete_btn" class="btn btn-link p-0"
+                                                onclick="return confirm('Are you sure you want to delete this product?');">
+                                                <i class="bx bx-trash text-danger h3 m-0"></i>
+                                            </button>
+                                        </form>
+                                        <a
+                                            href="edit-product.php?product_id=<?= $product['id'] ?>&token=<?= $_SESSION['csrf_token'] ?>"><i
+                                                class="bx bx-edit text-warning h3 m-0"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
