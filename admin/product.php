@@ -150,7 +150,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
 ?>
 <!-- Row -->
 
-<button onclick="history.back()" class="btn btn-transparent d-flex justify-content-between align-items-center"><img src="./assets/icons/back.svg" alt="">Back</button>
+<a href="categories.php" class="btn btn-transparent d-flex justify-content-start align-items-center"><img src="./assets/icons/back.svg" alt="">Back</a>
 <div class="container-fluid mt-3">
     <?php if (!empty($alert)) : ?>
         <div class="alert alert-<?= htmlspecialchars($status) === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show mt-3" role="alert">

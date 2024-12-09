@@ -6,7 +6,7 @@ $stm_orders->execute();
 $orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<button onclick="history.back()" class="btn btn-transparent d-flex justify-content-between align-items-center"><img src="./assets/icons/back.svg" alt=""> Back</button>
+<a href="index.php" class="btn btn-transparent d-flex justify-content-start align-items-center"><img src="./assets/icons/back.svg" alt="">Back</a>
 <div class="container-fluid mt-4">
     <div class="text-start">
         <h3 class="fw-bold">Recent Documents</h3>
