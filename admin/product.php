@@ -1,51 +1,109 @@
 <?php include_once('includes/header.php');
 
-$sql_categories = "SELECT * FROM `categories`";
-$stm_categories = $pdo->prepare($sql_categories);
-$stm_categories->execute();
-$categories = $stm_categories->fetchAll(PDO::FETCH_ASSOC);
+$category_products = [];
+if (isset($_GET['category_id'])) {
+    $category_id = $_GET['category_id'];
+    $sql_category_products =
+        "SELECT *, `products`.`name` as `product_name`, `inventorysummary`.`current_qty` as `product_qty` FROM `products`
+    INNER JOIN `inventorysummary` ON `products`.`id` = `inventorysummary`.`product_id` WHERE `products`.`category_id` = $category_id";
+    $stm_category_products = $pdo->prepare($sql_category_products);
+    $stm_category_products->execute();
+    $category_products = $stm_category_products->fetchAll(PDO::FETCH_ASSOC);
 
-// Process Delete Request
-// if (isset($_POST['delete_btn'], $_POST['product_id'], $_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
-//     $product_id = (int)$_POST['product_id'];
+    $sql_category = "SELECT `categories`.`name` as `category_name`, `categories`.`id` FROM `categories` WHERE `categories`.`id` = $category_id";
+    $stm_category = $pdo->prepare($sql_category);
+    $stm_category->execute();
+    $category = $stm_category->fetch(PDO::FETCH_ASSOC);
+}
 
-//     if (filter_var($product_id, FILTER_VALIDATE_INT)) {
-//         $sql_delete_product = "DELETE FROM `products` WHERE id = ?";
-//         $stm_delete_product = $pdo->prepare($sql_delete_product);
+// Process Delete Category Request
+if (isset($_POST['delete_category_btn'], $_POST['category_id'], $_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
+    $category_id = (int)$_POST['category_id'];
 
-//         if ($stm_delete_product->execute([$product_id])) {
-//             header('Location: product.php?action=product_delete');
-//             exit;
-//         } else {
-//             header('Location: product.php?action=product_delete_fail');
-//         }
-//     }
-// }
+    if (filter_var($category_id, FILTER_VALIDATE_INT)) {    
+        $sql_delete_category = "DELETE FROM `categories` WHERE id = ?";
+        $stm_delete_category = $pdo->prepare($sql_delete_category);
 
-$categry_errors = [];
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category_btn'])) {
-    $category_name = $_POST['category_name'];
-
-    if (empty($category_name)) {
-        $categry_errors[] = "Please fill in all the fields.";
-    }
-
-    if (empty($categry_errors)) {
-        $insertCategorySql = "INSERT INTO `categories` (`name`) VALUES (?)";
-        $categoryStmt = $pdo->prepare($insertCategorySql);
-        $categoryStmt->execute([$category_name]);
-        header("Location: product.php?action=add_category&status=success");
-    } else {
-        $categry_errors[] = "Error adding category.";
-        header("Location: product.php?action=add_category&status=error");
+        if ($stm_delete_category->execute([$category_id])) {
+            header('Location: categories.php?action=delete_category&status=success');
+            exit;
+        } else {
+            header('Location: categories.php?action=delete_category&status=error');
+        }
     }
 }
 
+// Process Add Product Request
+$product_errors = [];
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product_btn'])) {
+    $category_id = $_POST['category_id'];
+    $product_name = $_POST['product_name'];
+    $product_length = $_POST['product_length'];
+    $product_qty = $_POST['product_qty'];
+
+    // Validate fields
+    if (empty($product_name) || empty($product_length) || empty($category_id) || empty($product_qty)) {
+        $product_errors[] = "Please fill in all the fields.";
+    }
+
+    if (empty($product_errors)) {
+        // Insert product into Products table
+        $insertProductSql = "INSERT INTO `products` (name, length, category_id) VALUES (?, ?, ?)";
+        $stmt = $pdo->prepare($insertProductSql);
+        $stmt->execute([$product_name, $product_length, $category_id]);
+        $product_id = $pdo->lastInsertId(); // Get the last inserted product ID
+
+        // Insert initial quantity into InventorySummary
+        $insertInventorySql = "INSERT INTO `inventorysummary` (product_id, current_qty) VALUES (?, ?)";
+        $inventoryStmt = $pdo->prepare($insertInventorySql);
+        $inventoryStmt->execute([$product_id, $product_qty]);
+
+        header("Location: product.php?category_id=$category_id&action=add_product&status=success");
+        exit;
+    } else {
+        header("Location: product.php?category_id=$category_id&action=add_product&status=error");
+        exit;
+    }
+}
+
+// Process Delete Product Request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product_btn'])) {
+    $product_id = $_POST['product_id'];
+    $category_id = $_POST['category_id'];
+
+    try {
+        // Delete from InventorySummary
+        $deleteInventorySql = "DELETE FROM `inventorysummary` WHERE product_id = ?";
+        $inventoryStmt = $pdo->prepare($deleteInventorySql);
+        $inventoryStmt->execute([$product_id]);
+
+        // Delete from Products table
+        $deleteProductSql = "DELETE FROM `products` WHERE id = ?";
+        $productStmt = $pdo->prepare($deleteProductSql);
+        $productStmt->execute([$product_id]);
+
+        header("Location: product.php?category_id=$category_id&action=delete_product&status=success");
+        exit;
+    } catch (Exception $e) {
+        header("Location: product.php?category_id=$category_id&action=delete_product&status=error");
+        exit;
+    }
+}
+
+
 if (isset($_GET['action']) && isset($_GET['status'])) {
     $alerts = [
-        'add_category' => [
-            'success' => 'Category Added successfully!',
-            'error' => 'Failed to Add Category.',
+        'add_product' => [
+            'success' => 'Product Added successfully!',
+            'error' => 'Failed to Add Product.',
+        ],
+        'edit_product' => [
+            'success' => 'Product Edited successfully!',
+            'error' => 'Failed to Edit Product.',
+        ],
+        'delete_product' => [
+            'success' => 'Product Deleted successfully!',
+            'error' => 'Failed to Delete Product.',
         ],
     ];
 
@@ -57,57 +115,111 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
 }
 ?>
 <!-- Row -->
-<button onclick="history.back()" class="btn btn-transparent d-flex justify-content-between align-items-center"><img src="./assets/icons/back.svg" alt=""> Back</button>
-<div class="container-fluid">
+
+<button onclick="history.back()" class="btn btn-transparent d-flex justify-content-between align-items-center"><img src="./assets/icons/back.svg" alt="">Back</button>
+<div class="container-fluid mt-3">
     <?php if (!empty($alert)) : ?>
         <div class="alert alert-<?= htmlspecialchars($status) === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show mt-3" role="alert">
             <strong class="text-uppercase me-1"><?= htmlspecialchars($status) ?>!</strong><?= htmlspecialchars($alert) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
-    <div class="row mt-4 col-12 justify-content-start p-0 m-0">
-        <div class="col-12 d-flex justify-content-start mb-2">
-            <button data-bs-toggle="modal" data-bs-target="#category" class="btn btn-small btn-primary d-flex justify-content-between align-items-center">
-                <img src="./assets/icons/folder-plus.svg" alt="">Add New Category</button>
-        </div>
-        <?php foreach ($categories as $category): ?>
-            <div class="col-12 col-md-4 col-xl-2 mb-2">
-                <a href="categories.php?category_id=<?= $category['id'] ?>" class="text-decoration-none">
-                    <div class="card bg-secondary">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
-                                    <h6 class="card-title text-white m-0 ms-1"><?= $category['name'] ?></h6>
-                                </div>
-                                <h6 class="card-text text-white m-0">776</h6>
-                            </div>
-                        </div>
-                    </div>
-                </a>
+    <div class="col-12">
+        <div class="bg-white">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-12 col-md-8">
+                    <h2>Products List - <?= $category['category_name'] ?></h2>
+                </div>
+                <div class="col-12 col-md-4 d-flex justify-content-between justify-content-md-end align-items-center">
+                    <button class="btn btn-small btn-primary" data-bs-toggle="modal" data-bs-target="#productAdd">Add New Product</button>
+                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="post"
+                        style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <input type="hidden" name="category_id" value="<?= $category_id ?>">
+                        <button type="submit" name="delete_category_btn" class="btn btn-small btn-danger ms-2"
+                            onclick="return confirm('Are you sure you want to delete this Category?');">
+                            Delete Category
+                        </button>
+                    </form>
+                </div>
             </div>
-        <?php endforeach; ?>
+            <div class="table-responsive text-nowrap mt-3">
+                <table class="table table-striped align-middle overflow-scroll col-12" id="table"
+                    data-search-align="left" data-pagination="true" data-toggle="table" data-search="true"
+                    data-searchable="true">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-center">No.</th>
+                            <th scope="col" class="text-center">Product Name</th>
+                            <th scope="col" class="text-center" data-sortable="true">Length(m)</th>
+                            <th scope="col" class="text-center" data-sortable="true">Qty</th>
+                            <th scope="col" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($category_products as $i => $product): ?>
+                            <tr class="<?= $product['product_qty'] < 8 ? 'table-warning' : 'table-white' ?>">
+                                <td class="text-center"><?= $i + 1 ?></td>
+                                <td class="text-center"><?= $product['product_name'] ?></td>
+                                <td class="text-center"><?= $product['length'] ?></td>
+                                <td class="text-center"><?= $product['product_qty'] ?></td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST"
+                                            style="display:inline;">
+                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                            <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                            <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
+                                            <button type="submit" name="delete_product_btn" class="btn btn-link p-0"
+                                                onclick="return confirm('Are you sure you want to delete this product?');">
+                                                <i class="bx bx-trash text-danger h3 m-0"></i>
+                                            </button>
+                                        </form>
+                                        <a
+                                            href="edit-product.php?product_id=<?= $product['id'] ?>&token=<?= $_SESSION['csrf_token'] ?>"><i
+                                                class="bx bx-edit text-warning h3 m-0"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
-
-<div class="modal fade" id="category" tabindex="-1" aria-labelledby="categoryLabel" aria-hidden="true">
+<!-- Modal Add Product-->
+<div class="modal fade" id="productAdd" tabindex="-1" aria-labelledby="productAddLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="categoryLabel">Modal title</h1>
+                <h1 class="modal-title fs-5" id="productAddLabel">Modal title</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="category_name" class="form-label">Category Name</label>
-                        <input type="text" name="category_name" class="form-control">
+                        <label for="productCategory" class="form-label">Product Category</label>
+                        <input type="text" class="form-control" value="<?= $category['category_name'] ?>" id="productCategory" disabled readonly>
+                        <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">Product Name</label>
+                        <input type="text" name="product_name" class="form-control" id="productName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="productLength" class="form-label">Product Length</label>
+                        <input type="text" name="product_length" class="form-control" id="productLength">
+                    </div>
+                    <div class="mb-3">
+                        <label for="productQty" class="form-label">Product Qty</label>
+                        <input type="number" name="product_qty" class="form-control" id="productQty">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" name="category_btn" class="btn btn-primary">Save changes</button>
+                    <button type="submit" name="add_product_btn" class="btn btn-primary">Save changes</button>
                 </div>
             </form>
         </div>

@@ -6,15 +6,14 @@ if (!isset($_SESSION['is_loggedin']) && ($_SESSION['role'] !== 'admin')) {
     header('Location: error.html');
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
-    // Validate CSRF token
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'logout') {
     if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        
         // Clear cookies (if login persistence was implemented)
         if (isset($_COOKIE['login_token'])) {
             setcookie('login_token', '', time() - 3600, "/");
         }
-        
+
         // Clear session variables
         session_unset();
         session_destroy();
@@ -66,8 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
                     <li class="nav-item">
 
                         <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
-                            <input type="hidden" name="csrf_token"
-                                value="<?php echo $_SESSION['csrf_token']; ?>">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                            <input type="hidden" name="action" value="logout">
                             <button type="submit" class="btn btn-outline-light">Logout</button>
                         </form>
                     </li>

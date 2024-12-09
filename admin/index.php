@@ -128,7 +128,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
     <?php endif; ?>
     <div class="row mt-4 col-12 justify-content-center p-0 m-0">
         <div class="col-12 col-md-4 col-xl-4 m-2">
-            <a href="product.php" class="text-decoration-none">
+            <a href="categories.php" class="text-decoration-none">
                 <div class="card bg-primary">
                     <div class="card-body text-center">
                         <h5 class="card-title"><img src="./assets/icons/package.svg" alt=""></h5>

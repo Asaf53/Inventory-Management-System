@@ -1,27 +1,10 @@
 <?php include_once('includes/header.php');
 
-$sql_orders = "SELECT *, `transactions`.`id` AS `transactions_id` FROM `transactions` INNER JOIN `products` ON `transactions`.`product_id` = `products`.`id`;";
+$sql_orders = "SELECT *, `transactions`.`id` AS `transactions_id` FROM `transactions` INNER JOIN `products` ON `transactions`.`product_id` = `products`.`id` ORDER BY `transactions`.`date` DESC";
 $stm_orders = $pdo->prepare($sql_orders);
 $stm_orders->execute();
 $orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
 ?>
-<!-- row -->
-<?php
-if (isset($_GET['action'])) {
-    $alerts = [
-        'order_add' => 'Order added successfully',
-    ];
-    $alert = $alerts[$_GET['action']] ?? null;
-}
-?>
-<?php if (!empty($alert)) : ?>
-    <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
-        <?= htmlspecialchars($alert) ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-<?php endif; ?>
 
 <button onclick="history.back()" class="btn btn-transparent d-flex justify-content-between align-items-center"><img src="./assets/icons/back.svg" alt=""> Back</button>
 <div class="container-fluid mt-4">
