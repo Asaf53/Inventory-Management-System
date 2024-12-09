@@ -209,7 +209,16 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                                                 <i class="bx bx-trash text-danger h3 m-0"></i>
                                             </button>
                                         </form>
-                                        <button class="btn btn-transparent p-0" data-bs-toggle="modal" data-bs-target="#productUpdate" data-id="<?= $product['id'] ?>"><i class="bx bx-edit text-warning h3 m-0"></i></button>
+                                        <button
+                                            class="btn btn-transparent p-0"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#productUpdate"
+                                            data-id="<?= $product['id'] ?>"
+                                            data-name="<?= htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-length="<?= htmlspecialchars($product['length'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-qty="<?= $product['current_qty'] ?>">
+                                            <i class="bx bx-edit text-warning h3 m-0"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -257,12 +266,12 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
         </div>
     </div>
 </div>
-<!-- Modal Edit Product-->
+<!-- Modal Edit Product -->
 <div class="modal fade" id="productUpdate" tabindex="-1" aria-labelledby="productUpdateLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="productUpdateLabel">Modal title</h1>
+                <h1 class="modal-title fs-5" id="productUpdateLabel">Edit Product</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
@@ -275,15 +284,15 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     </div>
                     <div class="mb-3">
                         <label for="productName" class="form-label">Product Name</label>
-                        <input type="text" name="product_name" class="form-control" id="productName">
+                        <input type="text" name="product_name" class="form-control" id="productName" required>
                     </div>
                     <div class="mb-3">
                         <label for="productLength" class="form-label">Product Length</label>
-                        <input type="text" name="product_length" class="form-control" id="productLength">
+                        <input type="text" name="product_length" class="form-control" id="productLength" required>
                     </div>
                     <div class="mb-3">
                         <label for="productQty" class="form-label">Product Qty</label>
-                        <input type="number" name="product_qty" class="form-control" id="productQty">
+                        <input type="number" name="product_qty" class="form-control" id="productQty" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -296,16 +305,22 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
 </div>
 
 <script>
-    // JavaScript to handle the modal's product_id
     document.addEventListener('DOMContentLoaded', function() {
         var productUpdateModal = document.getElementById('productUpdate');
         productUpdateModal.addEventListener('show.bs.modal', function(event) {
             var button = event.relatedTarget; // Button that triggered the modal
-            var productId = button.getAttribute('data-id'); // Extract info from data-id attribute
 
-            // Update the modal's hidden input field
-            var modalProductIdInput = productUpdateModal.querySelector('#modalProductId');
-            modalProductIdInput.value = productId;
+            // Extract data-* attributes
+            var productId = button.getAttribute('data-id');
+            var productName = button.getAttribute('data-name');
+            var productLength = button.getAttribute('data-length');
+            var productQty = button.getAttribute('data-qty');
+
+            // Populate modal fields
+            productUpdateModal.querySelector('#modalProductId').value = productId;
+            productUpdateModal.querySelector('#productName').value = productName;
+            productUpdateModal.querySelector('#productLength').value = productLength;
+            productUpdateModal.querySelector('#productQty').value = productQty;
         });
     });
 </script>
