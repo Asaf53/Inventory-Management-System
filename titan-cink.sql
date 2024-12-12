@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 09, 2024 at 10:00 PM
+-- Generation Time: Dec 12, 2024 at 07:37 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.3.12
 
@@ -96,6 +96,23 @@ CREATE TABLE `sales` (
   `quantity` int NOT NULL,
   `sale_date` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system`
+--
+
+CREATE TABLE `system` (
+  `bearer` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `system`
+--
+
+INSERT INTO `system` (`bearer`) VALUES
+('EAAOkIcIDeIoBOzH9vZAZBZBAvhSnILn740tNZAgtDZBmKoGFQwGo8ZCKUhGo0nSfwZB9IXGZA1RlyBYXRQmvF5Jo8mCyfufugGs1MrJ2JHvLITjVJVaZAac9AjuOeD5MqCXnco3EqHDK0SfbemupZB7nsyTO2xSBIIBc0SeOtMwU5GnD9z2RqlMeWoRZAZAwNcTGVo9UZAQZDZD');
 
 -- --------------------------------------------------------
 

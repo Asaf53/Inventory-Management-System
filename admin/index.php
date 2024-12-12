@@ -56,12 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
         $transaction_product_errors[] = "Please fill in all the fields.";
     } else {
         // Get the current quantity from InventorySummary
-        $currentQtySql = "SELECT current_qty FROM InventorySummary WHERE product_id = ?";
+        $currentQtySql = "SELECT current_qty, `products`.`name` as `product_name` FROM InventorySummary INNER JOIN `products` ON `inventorysummary`.`product_id` = `products`.`id` WHERE product_id = ?";
         $stmt = $pdo->prepare($currentQtySql);
         $stmt->execute([$product_id]);
 
         if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $current_qty = $row['current_qty'];
+            $product_name = $row['product_name'];
 
             // Update the quantity based on transaction type
             switch ($transaction_type) {
@@ -72,9 +73,70 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
                     if ($new_quantity > $current_qty) {
                         $transaction_product_errors[] = "Error: Insufficient stock for this operation.";
                     } else {
+                        $sql_access_token = "SELECT `bearer` FROM `system`";
+                        $sql_access_token = $pdo->prepare($sql_access_token);
+                        $sql_access_token->execute();
+                        $access_token = $sql_access_token->fetch(PDO::FETCH_ASSOC);
+
                         $updated_qty = $current_qty - $new_quantity;
+                        // Check if the updated quantity is below the threshold
+                        if ($updated_qty < 8) {
+                            // API URL
+                            $api_url = "https://graph.facebook.com/v21.0/482636938268759/messages";
+
+                            // Access token
+                            $access_token = $access_token['bearer'];
+
+                            // Recipient's phone number
+                            $to = "38970832727";
+
+                            // Message payload for the custom template
+                            $data = [
+                                "messaging_product" => "whatsapp",
+                                "to" => $to,
+                                "type" => "template",
+                                "template" => [
+                                    "name" => "low_stock_alert_titan_cink", // Replace with your approved template name
+                                    "language" => [
+                                        "code" => "en_US"
+                                    ],
+                                    "components" => [
+                                        [
+                                            "type" => "body",
+                                            "parameters" => [
+                                                ["type" => "text", "text" => $product_name], // Placeholder {{1}}
+                                                ["type" => "text", "text" => (string)$updated_qty] // Placeholder {{2}}
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ];
+
+                            // Initialize cURL
+                            $ch = curl_init();
+                            curl_setopt($ch, CURLOPT_URL, $api_url);
+                            curl_setopt($ch, CURLOPT_POST, true);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                                "Authorization: Bearer $access_token",
+                                "Content-Type: application/json"
+                            ]);
+                            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+                            // Execute the request
+                            $response = curl_exec($ch);
+                            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                            // Check response
+                            if ($http_code === 200) {
+                                echo "WhatsApp alert message sent successfully.";
+                            } else {
+                                echo "Failed to send WhatsApp alert message. Response: " . $response;
+                            }
+
+                            curl_close($ch);
+                        }
                     }
-                    break;
                 default:
                     $transaction_product_errors[] = "Invalid transaction type.";
             }
