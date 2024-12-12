@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
         $transaction_product_errors[] = "Please fill in all the fields.";
     } else {
         // Get the current quantity from InventorySummary
-        $currentQtySql = "SELECT current_qty, `products`.`name` as `product_name` FROM InventorySummary INNER JOIN `products` ON `inventorysummary`.`product_id` = `products`.`id` WHERE product_id = ?";
+        $currentQtySql = "SELECT current_qty, `products`.`name` as `product_name` FROM `inventorysummary` INNER JOIN `products` ON `inventorysummary`.`product_id` = `products`.`id` WHERE `inventorysummary`.`product_id` = ?";
         $stmt = $pdo->prepare($currentQtySql);
         $stmt->execute([$product_id]);
 
@@ -73,14 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
                     if ($new_quantity > $current_qty) {
                         $transaction_product_errors[] = "Error: Insufficient stock for this operation.";
                     } else {
-                        $sql_access_token = "SELECT `bearer` FROM `system`";
-                        $sql_access_token = $pdo->prepare($sql_access_token);
-                        $sql_access_token->execute();
-                        $access_token = $sql_access_token->fetch(PDO::FETCH_ASSOC);
-
                         $updated_qty = $current_qty - $new_quantity;
+
                         // Check if the updated quantity is below the threshold
                         if ($updated_qty < 8) {
+                            // WhatsApp Notification
+                            $sql_access_token = "SELECT `bearer` FROM `system`";
+                            $sql_access_token = $pdo->prepare($sql_access_token);
+                            $sql_access_token->execute();
+                            $access_token = $sql_access_token->fetch(PDO::FETCH_ASSOC);
                             // API URL
                             $api_url = "https://graph.facebook.com/v21.0/482636938268759/messages";
 
@@ -128,15 +129,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
                             $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
                             // Check response
-                            if ($http_code === 200) {
-                                echo "WhatsApp alert message sent successfully.";
-                            } else {
+                            if ($http_code !== 200) {
                                 echo "Failed to send WhatsApp alert message. Response: " . $response;
                             }
 
                             curl_close($ch);
                         }
                     }
+                    break;
                 default:
                     $transaction_product_errors[] = "Invalid transaction type.";
             }
@@ -144,17 +144,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
             // Proceed only if there are no errors
             if (empty($transaction_product_errors)) {
                 // Update InventorySummary
-                $updateQtySql = "UPDATE InventorySummary SET current_qty = ? WHERE product_id = ?";
+                $updateQtySql = "UPDATE inventorysummary SET current_qty = ? WHERE product_id = ?";
                 $updateStmt = $pdo->prepare($updateQtySql);
 
                 if ($updateStmt->execute([$updated_qty, $product_id])) {
                     // Log the transaction in Transactions table
-                    $insertTransactionSql = "INSERT INTO Transactions (product_id, type, quantity) VALUES (?, ?, ?)";
+                    $insertTransactionSql = "INSERT INTO transactions (product_id, type, quantity) VALUES (?, ?, ?)";
                     $transactionStmt = $pdo->prepare($insertTransactionSql);
                     $transactionStmt->execute([$product_id, $transaction_type, $new_quantity]);
 
                     echo "Product quantity updated successfully!";
-                    header("Location: index.php?action=product_qty&status=success");
                 } else {
                     $transaction_product_errors[] = "Error updating quantity.";
                 }
@@ -163,7 +162,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
             $transaction_product_errors[] = "Product not found.";
         }
     }
+
+    // Redirect to the appropriate page after all operations are done
+    if (empty($transaction_product_errors)) {
+        header("Location: index.php?action=product_qty&status=success");
+    } else {
+        // Optionally handle errors by redirecting or displaying error messages
+        header("Location: index.php?action=product_qty&status=error");
+    }
+    exit();
 }
+
 ?>
 <?php
 if (isset($_GET['action']) && isset($_GET['status'])) {
