@@ -204,7 +204,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     <div class="card-body text-center">
                         <h5 class="card-title"><img src="./assets/icons/package.svg" alt=""></h5>
                         <h5 class="card-title text-white">Goods</h5>
-                        <p class="card-text text-white">776 / 6,340.63</p>
+                        <!-- <p class="card-text text-white">776 / 6,340.63</p> -->
                     </div>
                 </div>
             </a>
@@ -215,7 +215,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     <div class="card-body text-center">
                         <h5 class="card-title"><img src="./assets/icons/documents.svg" alt=""></h5>
                         <h5 class="card-title text-white">Documents</h5>
-                        <p class="card-text text-white">776</p>
+                        <!-- <p class="card-text text-white">776</p> -->
                     </div>
                 </div>
             </a>

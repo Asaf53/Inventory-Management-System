@@ -1,13 +1,43 @@
 <?php include_once('includes/header.php');
 
-$sql_orders = "SELECT *, `transactions`.`id` AS `transactions_id` FROM `transactions` INNER JOIN `products` ON `transactions`.`product_id` = `products`.`id` ORDER BY `transactions`.`date` DESC";
+// Get the type parameter from the URL
+$type = isset($_GET['type']) ? $_GET['type'] : 'all';
+
+// Base SQL query
+$sql_orders = "SELECT *, `transactions`.`id` AS `transactions_id` 
+               FROM `transactions` 
+               INNER JOIN `products` ON `transactions`.`product_id` = `products`.`id`";
+
+// Add condition based on type
+if ($type === 'incoming') {
+    $sql_orders .= " WHERE `transactions`.`type` = 'incoming'";
+} elseif ($type === 'outgoing') {
+    $sql_orders .= " WHERE `transactions`.`type` = 'outgoing'";
+}
+
+// Add ordering
+$sql_orders .= " ORDER BY `transactions`.`date` DESC";
+
 $stm_orders = $pdo->prepare($sql_orders);
 $stm_orders->execute();
 $orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<a href="index.php" class="btn btn-transparent d-flex justify-content-start align-items-center"><img src="./assets/icons/back.svg" alt="">Back</a>
+<a href="index.php" class="btn btn-transparent d-flex-inline justify-content-start align-items-center"><img src="./assets/icons/back.svg" alt="">Back</a>
 <div class="container-fluid mt-4">
+    <div class="m-4">
+        <ul class="nav nav-pills nav-justified col-12 col-md-6 m-auto">
+            <li class="nav-item">
+                <a class="nav-link <?= !isset($_GET['type']) || $_GET['type'] === 'all' ? 'active bg-primary' : '' ?>" href="?type=all">All</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?= isset($_GET['type']) && $_GET['type'] === 'incoming' ? 'active bg-primary' : '' ?>" href="?type=incoming">Incoming</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?= isset($_GET['type']) && $_GET['type'] === 'outgoing' ? 'active bg-primary' : '' ?>" href="?type=outgoing">Outgoing</a>
+            </li>
+        </ul>
+    </div>
     <div class="text-start">
         <h3 class="fw-bold">Recent Documents</h3>
     </div>

@@ -50,7 +50,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
 }
 ?>
 <!-- Row -->
-<a href="index.php" class="btn btn-transparent d-flex justify-content-start align-items-center"><img src="./assets/icons/back.svg" alt="">Back</a>
+<a href="index.php" class="btn btn-transparent d-flex-inline justify-content-start align-items-center"><img src="./assets/icons/back.svg" alt="">Back</a>
 <div class="container-fluid">
     <?php if (!empty($alert)) : ?>
         <div class="alert alert-<?= htmlspecialchars($status) === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show mt-3" role="alert">
