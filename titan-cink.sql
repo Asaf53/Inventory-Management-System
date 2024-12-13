@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 12, 2024 at 07:37 PM
+-- Generation Time: Dec 13, 2024 at 08:41 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.3.12
 
@@ -62,7 +62,7 @@ CREATE TABLE `inventorysummary` (
 --
 
 INSERT INTO `inventorysummary` (`product_id`, `current_qty`) VALUES
-(4, 40);
+(4, 1);
 
 -- --------------------------------------------------------
 
@@ -134,7 +134,13 @@ CREATE TABLE `transactions` (
 
 INSERT INTO `transactions` (`id`, `product_id`, `type`, `quantity`, `date`) VALUES
 (13, 4, 'incoming', 15, '2024-12-09 19:11:42'),
-(14, 4, 'outgoing', 30, '2024-12-09 19:12:10');
+(14, 4, 'outgoing', 30, '2024-12-09 19:12:10'),
+(15, 4, 'incoming', 15, '2024-12-12 20:43:54'),
+(16, 4, 'incoming', 5, '2024-12-12 20:58:55'),
+(17, 4, 'outgoing', 15, '2024-12-12 21:02:42'),
+(18, 4, 'incoming', 11, '2024-12-12 21:04:58'),
+(19, 4, 'incoming', 15, '2024-12-12 23:23:21'),
+(20, 4, 'outgoing', 19, '2024-12-12 23:24:04');
 
 -- --------------------------------------------------------
 
@@ -158,7 +164,7 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `fullname`, `email`, `password`, `phone`, `role`, `login_token`) VALUES
 (6, 'Asaf Rushiti', 'asaf222@gmail.com', '$2y$10$HcMfr8Uit2sDjSbJgP5pHOjld2wqNbunDOXw2r9LlFBx/XDZq6T36', '+389 70832727', 'admin', ''),
-(7, 'Asaf Rushiti', 'asaf@gmail.com', '$2y$10$T9lfWvVA.BEsf/.U.NBWDOQtuiaSCtj8/dmlSgG9Ef5BqRusi.kO2', '000111222', 'admin', '$2y$10$kSiGpUwhUlYTZHscGj/ppOgsFplqHSqk/S4oB9HTrChjdjrw/TQQy');
+(7, 'Asaf Rushiti', 'asaf@gmail.com', '$2y$10$T9lfWvVA.BEsf/.U.NBWDOQtuiaSCtj8/dmlSgG9Ef5BqRusi.kO2', '000111222', 'admin', '$2y$10$V6R/eusJtG3CcMDf2Om3cuSGMj016dbimRtVcb1vFxqZ3RfA76lJy');
 
 --
 -- Indexes for dumped tables
@@ -230,7 +236,7 @@ ALTER TABLE `sales`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `user`
