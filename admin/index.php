@@ -239,7 +239,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
             </button>
         </div>
         <div class="col-12 col-md-4 col-xl-4 m-2">
-            <a href="#" class="text-decoration-none">
+            <a href="reports.php" class="text-decoration-none">
                 <div class="card bg-primary">
                     <div class="card-body text-center">
                         <h5 class="card-title"><img src="./assets/icons/reports.svg" alt=""></h5>
