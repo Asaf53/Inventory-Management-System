@@ -8,7 +8,8 @@ $query = "
         categories.id AS category_id, 
         categories.name AS category_name, 
         products.id AS product_id, 
-        products.name AS product_name 
+        products.name AS product_name,
+        products.length AS product_length 
     FROM categories 
     LEFT JOIN products ON categories.id = products.category_id
     ORDER BY categories.name, products.name;
@@ -27,6 +28,7 @@ foreach ($results as $row) {
     $category_name = $row['category_name'];
     $product_id = $row['product_id'];
     $product_name = $row['product_name'];
+    $product_length = $row['product_length'];
 
     // Initialize the category array if not already set
     if (!isset($data[$category_name])) {
@@ -38,6 +40,7 @@ foreach ($results as $row) {
         $data[$category_name][] = [
             'id' => $product_id,
             'name' => $product_name,
+            'length' => $product_length,
         ];
     }
 }
@@ -267,7 +270,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                                     <optgroup label="<?= htmlspecialchars($category) ?>">
                                         <?php foreach ($products as $product): ?>
                                             <option value="<?= htmlspecialchars($product['id']) ?>">
-                                                <?= htmlspecialchars($product['name']) ?>
+                                            <?= htmlspecialchars($product['length']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </optgroup>
@@ -304,8 +307,8 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                                 <?php foreach ($data as $category => $products): ?>
                                     <optgroup label="<?= htmlspecialchars($category) ?>">
                                         <?php foreach ($products as $product): ?>
-                                            <option value="<?= htmlspecialchars($product['id']) ?>">
-                                                <?= htmlspecialchars($product['name']) ?>
+                                            <option value="<?= htmlspecialchars(string: $product['id']) ?>">
+                                                <?= htmlspecialchars($product['length']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </optgroup>

@@ -48,9 +48,10 @@ $orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
                     <div class="d-flex">
                         <span class="w-10 h-100 bg-<?= htmlspecialchars($order['type']) === 'incoming' ? 'success' : 'danger' ?>"></span>
                         <div class="ms-2">
-                            <a href="#" class="link-primary text-decoration-none card-title">
-                                <h4><?= $order['type'] ?> №<?= $order['transactions_id'] ?></h4>
-                            </a>
+                            <!-- <a href="#" class="link-primary text-decoration-none card-title"> -->
+                                <!-- <h4><?= $order['type'] ?> №<?= $order['transactions_id'] ?></h4> -->
+                                <h4><?= $order['name'] ?> - <?= $order['length'] ?></h4>
+                            <!-- </a> -->
                             <p class="card-text text-secondary mb-0 fw-medium">from <?= $order['date'] ?></p>
                         </div>
                     </div>

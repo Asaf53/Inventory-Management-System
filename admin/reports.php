@@ -11,7 +11,7 @@ $orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
     <div class="text-start">
         <h3 class="fw-bold">Reports</h3>
     </div>
-    <div class="col-12">
+    <!-- <div class="col-12">
         <div class="card bg-white shadow mb-2">
             <a href="#" class="text-decoration-none">
                 <div class="card-body d-flex justify-content-between align-items-center">
@@ -28,7 +28,7 @@ $orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </a>
         </div>
-    </div>
+    </div> -->
 </div>
 <script src="assets/js/jquery-1.11.0.min.js"></script>
 <script src="assets/js/bootstrap.bundle.min.js"></script>

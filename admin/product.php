@@ -184,7 +184,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     <thead>
                         <tr>
                             <th scope="col" class="text-center">No.</th>
-                            <th scope="col" class="text-center">Product Name</th>
+                            <!-- <th scope="col" class="text-center">Product Name</th> -->
                             <th scope="col" class="text-center" data-sortable="true">Length(m)</th>
                             <th scope="col" class="text-center" data-sortable="true">Qty</th>
                             <th scope="col" class="text-center">Action</th>
@@ -194,7 +194,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                         <?php foreach ($category_products as $i => $product): ?>
                             <tr class="<?= $product['product_qty'] < 8 ? 'table-warning' : 'table-white' ?>">
                                 <td class="text-center"><?= $i + 1 ?></td>
-                                <td class="text-center"><?= $product['product_name'] ?></td>
+                                <!-- <td class="text-center"><?= $product['product_name'] ?></td> -->
                                 <td class="text-center"><?= $product['length'] ?></td>
                                 <td class="text-center"><?= $product['product_qty'] ?></td>
                                 <td class="text-center">
