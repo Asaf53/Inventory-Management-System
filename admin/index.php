@@ -78,6 +78,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
                     } else {
                         $updated_qty = $current_qty - $new_quantity;
 
+                        // Insert the sale record into the sales table
+                        $insertSaleQuery = "
+                            INSERT INTO sales (product_id, quantity)
+                            VALUES (:product_id, :quantity)";
+                        $stmt = $pdo->prepare($insertSaleQuery);
+                        $stmt->execute([
+                            ':product_id' => $product_id,
+                            ':quantity' => $new_quantity,
+                        ]);
+
                         // Check if the updated quantity is below the threshold
                         if ($updated_qty < 8) {
                             // WhatsApp Notification
@@ -266,13 +276,14 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                         <div class="mb-3">
                             <label for="categoryProductSelect" class="form-label">Select Product</label>
                             <div class="d-flex justify-content-between align-items-center">
-                                <select class="form-select" id="categorySelect">
+                                <select id="categorySelectOutgoing" class="form-select">
                                     <option value="">Select a category</option>
-                                    <?php foreach ($data as $category => $products): ?>
+                                    <?php foreach (array_keys($data) as $category): ?>
                                         <option value="<?= htmlspecialchars($category) ?>"><?= htmlspecialchars($category) ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <select class="form-select" id="productSelect" name="product_id" disabled>
+
+                                <select id="productSelectOutgoing" class="form-select" name="product_id" disabled>
                                     <option value="">Select a product</option>
                                 </select>
                             </div>
@@ -304,13 +315,14 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                         <div class="mb-3">
                             <label for="categoryProductSelect" class="form-label">Select Product</label>
                             <div class="d-flex justify-content-between align-items-center">
-                                <select class="form-select" id="categorySelect">
+                                <select id="categorySelectIncoming" class="form-select">
                                     <option value="">Select a category</option>
-                                    <?php foreach ($data as $category => $products): ?>
+                                    <?php foreach (array_keys($data) as $category): ?>
                                         <option value="<?= htmlspecialchars($category) ?>"><?= htmlspecialchars($category) ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <select class="form-select" id="productSelect" name="product_id" disabled>
+
+                                <select id="productSelectIncoming" class="form-select" name="product_id" disabled>
                                     <option value="">Select a product</option>
                                 </select>
                             </div>
@@ -340,33 +352,38 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
     // Data passed from PHP to JavaScript
     const data = <?= json_encode($data) ?>;
 
-    // DOM Elements
-    const categorySelect = document.getElementById('categorySelect');
-    const productSelect = document.getElementById('productSelect');
+    // Function to handle category selection and update products
+    function setupDropdowns(categorySelectId, productSelectId) {
+        const categorySelect = document.getElementById(categorySelectId);
+        const productSelect = document.getElementById(productSelectId);
 
-    // Event listener for category selection
-    categorySelect.addEventListener('change', function() {
-        const selectedCategory = this.value;
+        categorySelect.addEventListener('change', function() {
+            const selectedCategory = this.value;
 
-        // Clear the product dropdown
-        productSelect.innerHTML = '<option value="">Select a product</option>';
+            // Clear the product dropdown
+            productSelect.innerHTML = '<option value="">Select a product</option>';
 
-        if (selectedCategory && data[selectedCategory]) {
-            // Populate the product dropdown with products of the selected category
-            data[selectedCategory].forEach(product => {
-                const option = document.createElement('option');
-                option.value = product.id;
-                option.textContent = `${product.name} (${product.length})`;
-                productSelect.appendChild(option);
-            });
+            if (selectedCategory && data[selectedCategory]) {
+                // Populate the product dropdown with products of the selected category
+                data[selectedCategory].forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = `${product.name} (${product.length})`;
+                    productSelect.appendChild(option);
+                });
 
-            // Enable the product dropdown
-            productSelect.disabled = false;
-        } else {
-            // Disable the product dropdown if no valid category is selected
-            productSelect.disabled = true;
-        }
-    });
+                // Enable the product dropdown
+                productSelect.disabled = false;
+            } else {
+                // Disable the product dropdown if no valid category is selected
+                productSelect.disabled = true;
+            }
+        });
+    }
+
+    // Setup dropdowns for both modals
+    setupDropdowns('categorySelectIncoming', 'productSelectIncoming');
+    setupDropdowns('categorySelectOutgoing', 'productSelectOutgoing');
 </script>
 
 </body>

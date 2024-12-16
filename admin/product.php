@@ -99,6 +99,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_product_btn']))
         exit;
     }
 }
+// Process Edit Category Request
+$category_update_errors = [];
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_category_btn'])) {
+    $category_id = $_POST['category_id'];
+    $category_name = $_POST['category_name'];
+
+    // Validate fields
+    if (empty($category_id) || empty($category_name)) {
+        $category_update_errors[] = "Please fill in all the fields.";
+    }
+
+    if (empty($category_update_errors)) {
+        // Update category in the Categorys table
+        $updateCategorySql = "UPDATE `categories` SET name = ? WHERE id = ?";
+        $stmt = $pdo->prepare($updateCategorySql);
+        $stmt->execute([$category_name, $category_id]);
+
+        header("Location: product.php?category_id=$category_id&action=update_category&status=success");
+        exit;
+    } else {
+        header("Location: product.php?category_id=$category_id&action=update_category&status=error");
+        exit;
+    }
+}
 
 // Process Delete Product Request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product_btn'])) {
@@ -135,6 +159,10 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
             'success' => 'Product Updated successfully!',
             'error' => 'Failed to Update Product.',
         ],
+        'update_category' => [
+            'success' => 'Category Updated successfully!',
+            'error' => 'Failed to Update Category.',
+        ],
         'delete_product' => [
             'success' => 'Product Deleted successfully!',
             'error' => 'Failed to Delete Product.',
@@ -166,6 +194,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                 </div>
                 <div class="col-12 col-md-4 d-flex justify-content-between justify-content-md-end align-items-center">
                     <button class="btn btn-small btn-primary" data-bs-toggle="modal" data-bs-target="#productAdd">Add New Product</button>
+                    <button class="btn btn-small btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#categoryUpdate">Update Category</button>
                     <form action="<?= $_SERVER['PHP_SELF'] ?>" method="post"
                         style="display:inline;">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -298,6 +327,30 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" name="update_product_btn" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Edit Category -->
+<div class="modal fade" id="categoryUpdate" tabindex="-1" aria-labelledby="categoryUpdateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="categoryUpdateLabel">Edit Category</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="category_name" class="form-label">Category Name</label>
+                        <input type="text" class="form-control" name="category_name" value="<?= $category['category_name'] ?>" id="category_name">
+                        <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" name="update_category_btn" class="btn btn-primary">Save changes</button>
                 </div>
             </form>
         </div>
