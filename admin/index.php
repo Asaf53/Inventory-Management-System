@@ -265,17 +265,17 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="categoryProductSelect" class="form-label">Select Product</label>
-                            <select class="form-select" id="categoryProductSelect" name="product_id">
-                                <?php foreach ($data as $category => $products): ?>
-                                    <optgroup label="<?= htmlspecialchars($category) ?>">
-                                        <?php foreach ($products as $product): ?>
-                                            <option value="<?= htmlspecialchars($product['id']) ?>">
-                                            <?= htmlspecialchars($product['length']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </optgroup>
-                                <?php endforeach; ?>
-                            </select>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <select class="form-select" id="categorySelect">
+                                    <option value="">Select a category</option>
+                                    <?php foreach ($data as $category => $products): ?>
+                                        <option value="<?= htmlspecialchars($category) ?>"><?= htmlspecialchars($category) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <select class="form-select" id="productSelect" name="product_id" disabled>
+                                    <option value="">Select a product</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="productQuantity" class="form-label">Set Quantity</label>
@@ -303,17 +303,17 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="categoryProductSelect" class="form-label">Select Product</label>
-                            <select class="form-select" id="categoryProductSelect" name="product_id">
-                                <?php foreach ($data as $category => $products): ?>
-                                    <optgroup label="<?= htmlspecialchars($category) ?>">
-                                        <?php foreach ($products as $product): ?>
-                                            <option value="<?= htmlspecialchars(string: $product['id']) ?>">
-                                                <?= htmlspecialchars($product['length']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </optgroup>
-                                <?php endforeach; ?>
-                            </select>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <select class="form-select" id="categorySelect">
+                                    <option value="">Select a category</option>
+                                    <?php foreach ($data as $category => $products): ?>
+                                        <option value="<?= htmlspecialchars($category) ?>"><?= htmlspecialchars($category) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <select class="form-select" id="productSelect" name="product_id" disabled>
+                                    <option value="">Select a product</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="productQuantity" class="form-label">Set Quantity</label>
@@ -335,6 +335,40 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
 <script src="assets/js/jquery-1.11.0.min.js"></script>
 <script src="assets/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.22.4/dist/bootstrap-table.min.js"></script>
+
+<script>
+    // Data passed from PHP to JavaScript
+    const data = <?= json_encode($data) ?>;
+
+    // DOM Elements
+    const categorySelect = document.getElementById('categorySelect');
+    const productSelect = document.getElementById('productSelect');
+
+    // Event listener for category selection
+    categorySelect.addEventListener('change', function() {
+        const selectedCategory = this.value;
+
+        // Clear the product dropdown
+        productSelect.innerHTML = '<option value="">Select a product</option>';
+
+        if (selectedCategory && data[selectedCategory]) {
+            // Populate the product dropdown with products of the selected category
+            data[selectedCategory].forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} (${product.length})`;
+                productSelect.appendChild(option);
+            });
+
+            // Enable the product dropdown
+            productSelect.disabled = false;
+        } else {
+            // Disable the product dropdown if no valid category is selected
+            productSelect.disabled = true;
+        }
+    });
+</script>
+
 </body>
 
 </html>
