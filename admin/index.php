@@ -9,11 +9,11 @@ $query = "
         categories.name AS category_name, 
         products.id AS product_id, 
         products.name AS product_name,
-        products.length AS product_length 
+        products.length AS product_length,
         inventorysummary.current_qty AS product_qty 
     FROM categories 
-    INNER JOIN products ON categories.id = products.category_id
-    INNER JOIN inventorysummary ON products.id = inventorysummary.product_id
+    LEFT JOIN products ON categories.id = products.category_id
+    LEFT JOIN inventorysummary ON products.id = inventorysummary.product_id
     ORDER BY categories.name, products.name;
 ";
 
@@ -297,6 +297,9 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                             <input type="number" name="new_quantity" class="form-control">
                             <input type="hidden" name="transaction_type" value="outgoing">
                         </div>
+                        <div class="mb-3">
+                            <p id="qtyDisplayOutgoing"></p>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -336,6 +339,9 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                             <input type="number" name="new_quantity" class="form-control">
                             <input type="hidden" name="transaction_type" value="incoming">
                         </div>
+                        <div class="mb-3">
+                            <p id="qtyDisplayIncoming"></p>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -357,15 +363,17 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
     const data = <?= json_encode($data) ?>;
 
     // Function to handle category selection and update products
-    function setupDropdowns(categorySelectId, productSelectId) {
+    function setupDropdowns(categorySelectId, productSelectId, qtyDisplayId) {
         const categorySelect = document.getElementById(categorySelectId);
         const productSelect = document.getElementById(productSelectId);
+        const qtyDisplay = document.getElementById(qtyDisplayId);
 
         categorySelect.addEventListener('change', function() {
             const selectedCategory = this.value;
 
-            // Clear the product dropdown
+            // Clear the product dropdown and reset quantity display
             productSelect.innerHTML = '<option value="">Select a product</option>';
+            qtyDisplay.textContent = "";
 
             if (selectedCategory && data[selectedCategory]) {
                 // Populate the product dropdown with products of the selected category
@@ -383,12 +391,29 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                 productSelect.disabled = true;
             }
         });
+
+        productSelect.addEventListener('change', function() {
+            const selectedProductId = this.value;
+
+            if (selectedProductId) {
+                // Find the selected product's data to display quantity
+                const selectedCategory = categorySelect.value;
+                const selectedProduct = data[selectedCategory].find(product => product.id == selectedProductId);
+
+                // Update quantity display
+                qtyDisplay.textContent = `Qty: ${selectedProduct ? selectedProduct.qty : 0}`;
+            } else {
+                // Clear quantity display if no product is selected
+                qtyDisplay.textContent = "";
+            }
+        });
     }
 
     // Setup dropdowns for both modals
-    setupDropdowns('categorySelectIncoming', 'productSelectIncoming');
-    setupDropdowns('categorySelectOutgoing', 'productSelectOutgoing');
+    setupDropdowns('categorySelectIncoming', 'productSelectIncoming', 'qtyDisplayIncoming');
+    setupDropdowns('categorySelectOutgoing', 'productSelectOutgoing', 'qtyDisplayOutgoing');
 </script>
+
 
 </body>
 
