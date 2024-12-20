@@ -10,8 +10,10 @@ $query = "
         products.id AS product_id, 
         products.name AS product_name,
         products.length AS product_length 
+        inventorysummary.current_qty AS product_qty 
     FROM categories 
-    LEFT JOIN products ON categories.id = products.category_id
+    INNER JOIN products ON categories.id = products.category_id
+    INNER JOIN inventorysummary ON products.id = inventorysummary.product_id
     ORDER BY categories.name, products.name;
 ";
 
@@ -29,6 +31,7 @@ foreach ($results as $row) {
     $product_id = $row['product_id'];
     $product_name = $row['product_name'];
     $product_length = $row['product_length'];
+    $product_qty = $row['product_qty'];
 
     // Initialize the category array if not already set
     if (!isset($data[$category_name])) {
@@ -41,6 +44,7 @@ foreach ($results as $row) {
             'id' => $product_id,
             'name' => $product_name,
             'length' => $product_length,
+            'qty' => $product_qty,
         ];
     }
 }
