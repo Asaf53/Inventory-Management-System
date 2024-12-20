@@ -400,13 +400,19 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                 const selectedCategory = categorySelect.value;
                 const selectedProduct = data[selectedCategory].find(product => product.id == selectedProductId);
 
-                // Update quantity display
-                qtyDisplay.textContent = `Qty: ${selectedProduct ? selectedProduct.qty : 0}`;
+                // Update quantity display and set class based on condition
+                const qty = selectedProduct ? selectedProduct.qty : 0;
+                qtyDisplay.textContent = `Qty: ${qty}`;
+                qtyDisplay.classList.remove('text-danger', 'text-dark'); // Remove any existing classes
+                qtyDisplay.classList.add(qty < 8 ? 'text-danger' : 'text-dark'); // Add appropriate class
             } else {
                 // Clear quantity display if no product is selected
                 qtyDisplay.textContent = "";
+                qtyDisplay.classList.remove('text-danger', 'text-dark'); // Remove classes
+                qtyDisplay.classList.add('text-dark'); // Default class
             }
         });
+
     }
 
     // Setup dropdowns for both modals
