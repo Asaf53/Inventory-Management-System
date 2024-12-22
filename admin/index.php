@@ -14,7 +14,7 @@ $query = "
     FROM categories 
     LEFT JOIN products ON categories.id = products.category_id
     LEFT JOIN inventorysummary ON products.id = inventorysummary.product_id
-    ORDER BY categories.name, products.name;
+    ORDER BY categories.name, products.name, products.length DESC;
 ";
 
 // Prepare and execute the query
