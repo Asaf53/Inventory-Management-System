@@ -5,6 +5,21 @@ $sql_sales = "SELECT *
                FROM `sales` 
                INNER JOIN `products` ON `sales`.`product_id` = `products`.`id`";
 
+// Add sorting based on the 'type' parameter
+if (isset($_GET['type'])) {
+    switch ($_GET['type']) {
+        case 'Day':
+            $sql_sales .= " WHERE DATE(`sales`.`sale_date`) = CURDATE()";
+            break;
+        case 'Month':
+            $sql_sales .= " WHERE MONTH(`sales`.`sale_date`) = MONTH(CURDATE()) AND YEAR(`sales`.`sale_date`) = YEAR(CURDATE())";
+            break;
+        case 'Year':
+            $sql_sales .= " WHERE YEAR(`sales`.`sale_date`) = YEAR(CURDATE())";
+            break;
+    }
+}
+
 $stm_sales = $pdo->prepare($sql_sales);
 $stm_sales->execute();
 $sales = $stm_sales->fetchAll(PDO::FETCH_ASSOC);
