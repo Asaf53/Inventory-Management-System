@@ -1,9 +1,13 @@
 <?php include_once('includes/header.php');
 
-$sql_orders = "SELECT *, `transactions`.`id` AS `transactions_id` FROM `transactions` INNER JOIN `products` ON `transactions`.`product_id` = `products`.`id`";
-$stm_orders = $pdo->prepare($sql_orders);
-$stm_orders->execute();
-$orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
+// Base SQL query
+$sql_sales = "SELECT * 
+               FROM `sales` 
+               INNER JOIN `products` ON `sales`.`product_id` = `products`.`id`";
+
+$stm_sales = $pdo->prepare($sql_sales);
+$stm_sales->execute();
+$sales = $stm_sales->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <a href="index.php" class="btn btn-transparent d-flex-inline justify-content-start align-items-center"><img src="./assets/icons/back.svg" alt="">Back</a>
@@ -11,24 +15,40 @@ $orders = $stm_orders->fetchAll(PDO::FETCH_ASSOC);
     <div class="text-start">
         <h3 class="fw-bold">Reports</h3>
     </div>
-    <!-- <div class="col-12">
-        <div class="card bg-white shadow mb-2">
-            <a href="#" class="text-decoration-none">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">Sales by Month</h4>
-                    <h3 class="text-secondary d-flex justify-content-center align-items-center m-0">View <img src="./assets/icons/reports-view.svg" alt=""></h3>
+
+    <div class="m-4">
+        <ul class="nav nav-pills nav-justified col-12 col-md-6 m-auto">
+            <li class="nav-item">
+                <a class="nav-link <?= !isset($_GET['type']) || $_GET['type'] === 'all' ? 'active bg-primary' : '' ?>" href="?type=all">All</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?= isset($_GET['type']) && $_GET['type'] === 'Day' ? 'active bg-primary' : '' ?>" href="?type=Day">Day</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?= isset($_GET['type']) && $_GET['type'] === 'Month' ? 'active bg-primary' : '' ?>" href="?type=Month">Month</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?= isset($_GET['type']) && $_GET['type'] === 'Year' ? 'active bg-primary' : '' ?>" href="?type=Year">Year</a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-12">
+        <?php foreach ($sales as $sale) : ?>
+            <div class="card bg-white border-0 rounded-0 border-bottom">
+                <div class="card-body d-flex justify-content-between">
+                    <div class="d-flex flex-column">
+                        <!-- <div class=""> -->
+                            <h4><?= $sale['name'] ?> - <?= $sale['length'] ?></h4>
+                            <p class="card-text text-secondary mb-0 fw-medium">from <?= $sale['sale_date'] ?></p>
+                        <!-- </div> -->
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <h3 class="text-secondary"><?= $sale['quantity'] ?></h3>
+                    </div>
                 </div>
-            </a>
-        </div>
-        <div class="card bg-white shadow mb-2">
-            <a href="#" class="text-decoration-none">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">Sales by Date</h4>
-                    <h3 class="text-secondary d-flex justify-content-center align-items-center m-0">View <img src="./assets/icons/reports-view.svg" alt=""></h3>
-                </div>
-            </a>
-        </div>
-    </div> -->
+            </div>
+        <?php endforeach; ?>
+    </div>
 </div>
 <script src="assets/js/jquery-1.11.0.min.js"></script>
 <script src="assets/js/bootstrap.bundle.min.js"></script>

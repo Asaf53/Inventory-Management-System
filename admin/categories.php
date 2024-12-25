@@ -1,7 +1,7 @@
 <?php include_once('includes/header.php');
 
 $sql_categories = "
-SELECT `categories`.`name` AS category_name, `categories`.`id` AS category_id, COUNT(`products`.`id`) AS product_count
+SELECT `categories`.`name` AS category_name, `categories`.`color` AS category_color, `categories`.`id` AS category_id, COUNT(`products`.`id`) AS product_count
 FROM  `categories`
 LEFT JOIN `products` ON 
 `categories`.`id` = `products`.`category_id`
@@ -14,15 +14,16 @@ $categories = $stm_categories->fetchAll(PDO::FETCH_ASSOC);
 $categry_errors = [];
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category_btn'])) {
     $category_name = $_POST['category_name'];
+    $category_color = $_POST['category_color'];
 
     if (empty($category_name)) {
         $categry_errors[] = "Please fill in all the fields.";
     }
 
     if (empty($categry_errors)) {
-        $insertCategorySql = "INSERT INTO `categories` (`name`) VALUES (?)";
+        $insertCategorySql = "INSERT INTO `categories` (`name`, `color`) VALUES (?, ?)";
         $categoryStmt = $pdo->prepare($insertCategorySql);
-        $categoryStmt->execute([$category_name]);
+        $categoryStmt->execute([$category_name, $category_color]);
         header("Location: categories.php?action=add_category&status=success");
     } else {
         $categry_errors[] = "Error adding category.";
@@ -66,7 +67,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
         <?php foreach ($categories as $category): ?>
             <div class="col-12 col-md-4 col-xl-2 mb-2">
                 <a href="product.php?category_id=<?= $category['category_id'] ?>" class="text-decoration-none">
-                    <div class="card bg-secondary">
+                    <div class="card" style="background-color: <?= $category['category_color'] ?>">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
@@ -96,6 +97,10 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     <div class="mb-3">
                         <label for="category_name" class="form-label">Category Name</label>
                         <input type="text" name="category_name" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="category_color" class="form-label">Category Color</label>
+                        <input type="color" name="category_color" class="form-control form-control-color">
                     </div>
                 </div>
                 <div class="modal-footer">

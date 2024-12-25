@@ -242,6 +242,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                 <div class="card bg-primary">
                     <div class="card-body text-center">
                         <h5 class="card-title"><img src="./assets/icons/package-plus.svg" alt=""></h5>
+                        <h5 class="card-title text-white">Incoming</h5>
                     </div>
                 </div>
             </button>
@@ -251,26 +252,17 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                 <div class="card bg-primary">
                     <div class="card-body text-center">
                         <h5 class="card-title"><img src="./assets/icons/package-minus.svg" alt=""></h5>
+                        <h5 class="card-title text-white">Outgoing</h5>
                     </div>
                 </div>
             </button>
         </div>
-        <!-- <div class="col-12 col-md-4 col-xl-4 m-2">
+        <div class="col-12 col-md-4 col-xl-4 m-2">
             <a href="reports.php" class="text-decoration-none">
                 <div class="card bg-primary">
                     <div class="card-body text-center">
                         <h5 class="card-title"><img src="./assets/icons/reports.svg" alt=""></h5>
                         <h5 class="card-title text-white">Reports</h5>
-                    </div>
-                </div>
-            </a>
-        </div> -->
-        <div class="col-12 col-md-4 col-xl-4 m-2">
-            <a href="sales.php" class="text-decoration-none">
-                <div class="card bg-primary">
-                    <div class="card-body text-center">
-                        <h5 class="card-title"><img src="./assets/icons/reports.svg" alt=""></h5>
-                        <h5 class="card-title text-white">Sales</h5>
                     </div>
                 </div>
             </a>

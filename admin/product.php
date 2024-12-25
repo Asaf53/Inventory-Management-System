@@ -104,6 +104,7 @@ $category_update_errors = [];
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_category_btn'])) {
     $category_id = $_POST['category_id'];
     $category_name = $_POST['category_name'];
+    $category_color = $_POST['category_color'];
 
     // Validate fields
     if (empty($category_id) || empty($category_name)) {
@@ -112,9 +113,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_category_btn'])
 
     if (empty($category_update_errors)) {
         // Update category in the Categorys table
-        $updateCategorySql = "UPDATE `categories` SET name = ? WHERE id = ?";
+        $updateCategorySql = "UPDATE `categories` SET name = ?, color = ? WHERE id = ?";
         $stmt = $pdo->prepare($updateCategorySql);
-        $stmt->execute([$category_name, $category_id]);
+        $stmt->execute([$category_name, $category_color, $category_id]);
 
         header("Location: product.php?category_id=$category_id&action=update_category&status=success");
         exit;
@@ -346,6 +347,10 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                         <label for="category_name" class="form-label">Category Name</label>
                         <input type="text" class="form-control" name="category_name" value="<?= $category['category_name'] ?>" id="category_name">
                         <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="category_color" class="form-label">Category Color</label>
+                        <input type="color" name="category_color" class="form-control form-control-color">
                     </div>
                 </div>
                 <div class="modal-footer">
