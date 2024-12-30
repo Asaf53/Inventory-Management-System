@@ -1,10 +1,16 @@
 <?php
 include_once('includes/header.php');
 
-if (isset($_SESSION['is_loggedin']) && ($_SESSION['role'] !== 'admin')) {
+if (isset($_SESSION['is_loggedin']) && $_SESSION['role'] === 'admin') {
+    header('Location: /admin/index.php');
+    exit();
+}
+
+if (isset($_SESSION['is_loggedin']) || $_SESSION['role'] !== 'admin') {
     session_unset();
     session_destroy();
-    header('Location: /admin/error.html');
+    header('Location: index.php');
+    exit();
 }
 
 $login_errors = [];
@@ -119,7 +125,7 @@ if (isset($_GET['action'])) {
     }
 }
 ?>
-<div class="container w-25 my-5">
+<div class="container col-12 col-md-4 my-5">
     <?php if (isset($_GET['action'])) : ?>
     <div class="alert alert-<?= ($_GET['type'] === 'warning') ? 'warning' : 'success'  ?> alert-dismissible fade show mt-3"
         role="alert">
