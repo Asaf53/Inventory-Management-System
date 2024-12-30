@@ -2,8 +2,9 @@
 session_start();
 include_once('database.php');
 
-if (!isset($_SESSION['is_loggedin']) && ($_SESSION['role'] !== 'admin')) {
+if (!isset($_SESSION['is_loggedin']) || $_SESSION['role'] !== 'admin') {
     header('Location: error.html');
+    exit();
 }
 
 
