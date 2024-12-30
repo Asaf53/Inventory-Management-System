@@ -2,8 +2,48 @@
 session_start();
 include_once('database.php');
 
+// Check for persistent login
+if (!isset($_SESSION['is_loggedin']) && isset($_COOKIE['login_token'])) {
+    $loginToken = $_COOKIE['login_token'];
+
+    try {
+        // Prepare the statement to fetch the user
+        $stmt = $conn->prepare("SELECT id, role, login_token FROM `user` WHERE login_token IS NOT NULL");
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($user = $result->fetch_assoc()) {
+            if (password_verify($loginToken, $user['login_token'])) {
+                // Regenerate the session
+                session_start();
+                session_regenerate_id(true);
+
+                // Restore session variables
+                $_SESSION['is_loggedin'] = true;
+                $_SESSION['role'] = $user['role'];
+
+                // Redirect based on role
+                if ($_SESSION['role'] === 'admin') {
+                    header('Location: /admin/index.php');
+                    exit();
+                } else {
+                    header('Location: /admin/error.html');
+                    exit();
+                }
+            }
+        }
+    } catch (Exception $e) {
+        error_log("Error verifying login token: " . $e->getMessage());
+    }
+
+    // If no valid session or token, redirect to login page
+    header('Location: /login.php');
+    exit();
+}
+
+// Regular session-based role check for logged-in users
 if (!isset($_SESSION['is_loggedin']) || $_SESSION['role'] !== 'admin') {
-    header('Location: error.html');
+    header('Location: /admin/error.html');
     exit();
 }
 

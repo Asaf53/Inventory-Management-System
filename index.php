@@ -6,11 +6,9 @@ if (isset($_SESSION['is_loggedin']) && $_SESSION['role'] === 'admin') {
     exit();
 }
 
-if (isset($_SESSION['is_loggedin']) || $_SESSION['role'] !== 'admin') {
+if (isset($_SESSION['is_loggedin']) && $_SESSION['role'] !== 'admin') {
     session_unset();
     session_destroy();
-    header('Location: index.php');
-    exit();
 }
 
 $login_errors = [];
