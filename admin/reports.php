@@ -5,53 +5,30 @@ $sql_sales = "SELECT *
                FROM `sales` 
                INNER JOIN `products` ON `sales`.`product_id` = `products`.`id`";
 
-// Add sorting based on the 'type' parameter
-if (isset($_GET['type'])) {
-    switch ($_GET['type']) {
-        case 'Day':
-            if (isset($_GET['date'])) {
-                $date = $_GET['date'];
-                $sql_sales .= " WHERE DATE(`sales`.`sale_date`) = :date";
-            } else {
-                $sql_sales .= " WHERE DATE(`sales`.`sale_date`) = CURDATE()";
-            }
-            break;
-        case 'Month':
-            if (isset($_GET['month']) && isset($_GET['year'])) {
-                $month = $_GET['month'];
-                $year = $_GET['year'];
-                $sql_sales .= " WHERE MONTH(`sales`.`sale_date`) = :month AND YEAR(`sales`.`sale_date`) = :year";
-            } else {
-                $sql_sales .= " WHERE MONTH(`sales`.`sale_date`) = MONTH(CURDATE()) AND YEAR(`sales`.`sale_date`) = YEAR(CURDATE())";
-            }
-            break;
-        case 'Year':
-            if (isset($_GET['start_year']) && isset($_GET['end_year'])) {
-                $start_year = $_GET['start_year'];
-                $end_year = $_GET['end_year'];
-                $sql_sales .= " WHERE YEAR(`sales`.`sale_date`) BETWEEN :start_year AND :end_year";
-            } else {
-                $sql_sales .= " WHERE YEAR(`sales`.`sale_date`) = YEAR(CURDATE())";
-            }
-            break;
-    }
+// Add filtering based on the 'daterange' parameter
+if (isset($_GET['daterange'])) {
+    // Extract start and end dates from the 'daterange' parameter
+    $daterange = $_GET['daterange'];
+    list($start_date, $end_date) = explode(' - ', $daterange);
+
+    // Convert dates to Y-m-d format (compatible with SQL)
+    $start_date = DateTime::createFromFormat('m/d/Y', trim($start_date))->format('Y-m-d');
+    $end_date = DateTime::createFromFormat('m/d/Y', trim($end_date))->format('Y-m-d');
+
+    // Append WHERE clause to filter by the date range
+    $sql_sales .= " WHERE `sales`.`sale_date` BETWEEN :start_date AND :end_date";
 }
 
+// Prepare the SQL statement
 $stm_sales = $pdo->prepare($sql_sales);
 
 // Bind parameters if they are set
-if (isset($date)) {
-    $stm_sales->bindParam(':date', $date);
-}
-if (isset($month) && isset($year)) {
-    $stm_sales->bindParam(':month', $month);
-    $stm_sales->bindParam(':year', $year);
-}
-if (isset($start_year) && isset($end_year)) {
-    $stm_sales->bindParam(':start_year', $start_year);
-    $stm_sales->bindParam(':end_year', $end_year);
+if (isset($start_date) && isset($end_date)) {
+    $stm_sales->bindParam(':start_date', $start_date);
+    $stm_sales->bindParam(':end_date', $end_date);
 }
 
+// Execute the query and fetch results
 $stm_sales->execute();
 $sales = $stm_sales->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -62,50 +39,39 @@ $sales = $stm_sales->fetchAll(PDO::FETCH_ASSOC);
         <h3 class="fw-bold">Reports</h3>
     </div>
 
-    <div class="m-4">
-        <ul class="nav nav-pills nav-justified col-12 col-md-6 m-auto">
-            <li class="nav-item">
-                <a class="nav-link <?= !isset($_GET['type']) || $_GET['type'] === 'all' ? 'active bg-primary' : '' ?>" href="?type=all">All</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <?= isset($_GET['type']) && $_GET['type'] === 'Day' ? 'active bg-primary' : '' ?>" href="?type=Day">Day</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <?= isset($_GET['type']) && $_GET['type'] === 'Month' ? 'active bg-primary' : '' ?>" href="?type=Month">Month</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <?= isset($_GET['type']) && $_GET['type'] === 'Year' ? 'active bg-primary' : '' ?>" href="?type=Year">Year</a>
-            </li>
-        </ul>
-    </div>
+    <!-- Single Date Input Form -->
+    <div class="my-4">
+        <?php if (isset($start_date, $end_date)) : ?>
+            <div class="d-flex align-items-center">
+                <span class="fw-bold">Selected Date:</span>
+                <p class="text-secondary mb-0 ms-2"><?= $start_date . " - " . $end_date?></p>
+            </div>
+        <?php endif; ?>
+        <form method="GET" action="<?php $_SERVER['PHP_SELF']; ?>">
+            <div class="d-flex justify-content-center justify-content-md-start">
+                <div class="form-floating">
+                    <input type="text" name="daterange" class="form-control rounded-0 rounded-start" id="sort_date">
+                    <label for="sort_date" class="form-label">Checkin / Checkout</label>
+                </div>
 
-    <!-- Date selection form -->
-    <div class="m-4">
-        <form method="GET" action="">
-            <input type="hidden" name="type" value="<?= $_GET['type'] ?? 'all' ?>">
-            <?php if ($_GET['type'] === 'Day'): ?>
-                <div class="form-group">
-                    <label for="date">Select Date:</label>
-                    <input type="date" id="date" name="date" class="form-control">
-                </div>
-            <?php elseif ($_GET['type'] === 'Month'): ?>
-                <div class="form-group">
-                    <label for="month">Select Month:</label>
-                    <input type="number" id="month" name="month" class="form-control" min="1" max="12">
-                    <label for="year">Select Year:</label>
-                    <input type="number" id="year" name="year" class="form-control" min="2000" max="<?= date('Y') ?>">
-                </div>
-            <?php elseif ($_GET['type'] === 'Year'): ?>
-                <div class="form-group">
-                    <label for="start_year">Start Year:</label>
-                    <input type="number" id="start_year" name="start_year" class="form-control" min="2000" max="<?= date('Y') ?>">
-                    <label for="end_year">End Year:</label>
-                    <input type="number" id="end_year" name="end_year" class="form-control" min="2000" max="<?= date('Y') ?>">
-                </div>
-            <?php endif; ?>
-            <button type="submit" class="btn btn-primary mt-2">Filter</button>
+                <button type="submit" class="btn btn-primary ms-2 rounded-0 rounded-end">Filter</button>
+            </div>
         </form>
     </div>
+    <!-- <div class="col-12 col-md-6 col-lg-3 mt-4 mt-lg-0">
+        <div class="form-floating">
+            <input type="date" class="form-control rounded-0" id="pickupDate" name="pickupDate">
+            <label for="pickupDate">Pickup Date:</label>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3 mt-4 mt-lg-0">
+        <div class="form-floating">
+            <input type="date" class="form-control rounded-0" id="returnDate" name="returnDate">
+            <label for="returnDate">Return Date:</label>
+        </div>
+    </div> -->
+
+
 
     <div class="col-12">
         <?php foreach ($sales as $sale) : ?>
@@ -126,6 +92,13 @@ $sales = $stm_sales->fetchAll(PDO::FETCH_ASSOC);
 <script src="assets/js/jquery-1.11.0.min.js"></script>
 <script src="assets/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.5/dist/bootstrap-table.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script>
+    $('input[name="daterange"]').daterangepicker({
+        showDropdowns: true,
+    });
+</script>
 </body>
 
 </html>
