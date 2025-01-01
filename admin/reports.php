@@ -48,9 +48,9 @@ $sales = $stm_sales->fetchAll(PDO::FETCH_ASSOC);
         <?php endif; ?>
         <form method="GET" action="<?php $_SERVER['PHP_SELF']; ?>">
             <div class="d-flex justify-content-center justify-content-md-start">
-                <div class="form-floating">
+                <div class="form-floating col-8 col-md-2">
                     <input type="text" name="daterange" class="form-control rounded-0 rounded-start" id="sort_date">
-                    <label for="sort_date" class="form-label">Checkin / Checkout</label>
+                    <label for="sort_date" class="form-label">Start Date / End Date</label>
                 </div>
 
                 <button type="submit" class="btn btn-primary ms-2 rounded-0 rounded-end">Filter</button>
