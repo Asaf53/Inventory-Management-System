@@ -1,8 +1,8 @@
 <?php include_once('includes/header.php');
 
 // Base SQL query
-$sql_sales = "SELECT `sales`.`quantity`, `sales`.`sale_date`, `products`.`length`, `products`.`name` FROM `sales` INNER JOIN `products` ON `sales`.`product_id` = `products`.`id`";
-// $sql_sales = "SELECT `sales`.`quantity`, `sales`.`sale_date`, `products`.`length`, `categories`.`name` FROM `sales` INNER JOIN `products` ON `sales`.`product_id` = `products`.`id` INNER JOIN `categories` ON `products`.`category_id` = `categories`.`id`";
+// $sql_sales = "SELECT `sales`.`quantity`, `sales`.`sale_date`, `products`.`length`, `products`.`name` FROM `sales` INNER JOIN `products` ON `sales`.`product_id` = `products`.`id`";
+$sql_sales = "SELECT `sales`.`quantity`, `sales`.`sale_date`, `products`.`length`, `categories`.`name` FROM `sales` INNER JOIN `products` ON `sales`.`product_id` = `products`.`id` INNER JOIN `categories` ON `products`.`category_id` = `categories`.`id`";
 
 // Add filtering based on the 'daterange' parameter
 if (isset($_GET['daterange'])) {
