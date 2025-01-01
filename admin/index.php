@@ -84,8 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
 
                         // Insert the sale record into the sales table
                         $insertSaleQuery = "
-                            INSERT INTO sales (product_id, quantity)
-                            VALUES (:product_id, :quantity)";
+                            INSERT INTO sales (product_id, quantity, sale_date)
+                            VALUES (:product_id, :quantity, CURDATE());";
                         $stmt = $pdo->prepare($insertSaleQuery);
                         $stmt->execute([
                             ':product_id' => $product_id,

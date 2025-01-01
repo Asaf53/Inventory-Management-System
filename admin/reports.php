@@ -1,9 +1,8 @@
 <?php include_once('includes/header.php');
 
 // Base SQL query
-$sql_sales = "SELECT * 
-               FROM `sales` 
-               INNER JOIN `products` ON `sales`.`product_id` = `products`.`id`";
+$sql_sales = "SELECT `sales`.`quantity`, `sales`.`sale_date`, `products`.`length`, `products`.`name` FROM `sales` INNER JOIN `products` ON `sales`.`product_id` = `products`.`id`";
+// $sql_sales = "SELECT `sales`.`quantity`, `sales`.`sale_date`, `products`.`length`, `categories`.`name` FROM `sales` INNER JOIN `products` ON `sales`.`product_id` = `products`.`id` INNER JOIN `categories` ON `products`.`category_id` = `categories`.`id`";
 
 // Add filtering based on the 'daterange' parameter
 if (isset($_GET['daterange'])) {
@@ -44,7 +43,7 @@ $sales = $stm_sales->fetchAll(PDO::FETCH_ASSOC);
         <?php if (isset($start_date, $end_date)) : ?>
             <div class="d-flex align-items-center">
                 <span class="fw-bold">Selected Date:</span>
-                <p class="text-secondary mb-0 ms-2"><?= $start_date . " - " . $end_date?></p>
+                <p class="text-secondary mb-0 ms-2"><?= $start_date . " - " . $end_date ?></p>
             </div>
         <?php endif; ?>
         <form method="GET" action="<?php $_SERVER['PHP_SELF']; ?>">
@@ -82,7 +81,7 @@ $sales = $stm_sales->fetchAll(PDO::FETCH_ASSOC);
                         <p class="card-text text-secondary mb-0 fw-medium">from <?= $sale['sale_date'] ?></p>
                     </div>
                     <div class="d-flex justify-content-center align-items-center">
-                        <h3 class="text-secondary"><?= $sale['quantity'] ?></h3>
+                        <h3 class="text-secondary"><?= $sale['quantity'] * $sale['length'] ?>m<sup>2</sup></h3>
                     </div>
                 </div>
             </div>
