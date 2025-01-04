@@ -15,11 +15,11 @@ if (!isset($_SESSION['is_loggedin']) && isset($_COOKIE['login_token'])) {
         while ($user = $result->fetch_assoc()) {
             if (password_verify($loginToken, $user['login_token'])) {
                 // Regenerate the session
-                session_start();
                 session_regenerate_id(true);
 
                 // Restore session variables
                 $_SESSION['is_loggedin'] = true;
+                $_SESSION['user_id'] = $user['id'];
                 $_SESSION['role'] = $user['role'];
 
                 // Redirect based on role
