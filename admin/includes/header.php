@@ -1,4 +1,12 @@
 <?php
+// Extend session cookie lifetime and session storage lifetime
+session_set_cookie_params([
+    'lifetime' => 2592000, // 30 days
+    'path' => '/',
+    'httponly' => true,
+    'samesite' => 'Strict',
+]);
+ini_set('session.gc_maxlifetime', 2592000); // Extend server-side session lifetime
 session_start();
 include_once('database.php');
 
