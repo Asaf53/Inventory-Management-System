@@ -1,12 +1,4 @@
 <?php
-// Extend session cookie lifetime and session storage lifetime
-session_set_cookie_params([
-    'lifetime' => 2592000, // 30 days
-    'path' => '/',
-    'httponly' => true,
-    'samesite' => 'Strict',
-]);
-ini_set('session.gc_maxlifetime', 2592000); // Extend server-side session lifetime
 session_start();
 include_once('database.php');
 
@@ -22,9 +14,6 @@ if (!isset($_SESSION['is_loggedin']) && isset($_COOKIE['login_token'])) {
 
         while ($user = $result->fetch_assoc()) {
             if (password_verify($loginToken, $user['login_token'])) {
-                // Regenerate the session
-                session_regenerate_id(true);
-
                 // Restore session variables
                 $_SESSION['is_loggedin'] = true;
                 $_SESSION['user_id'] = $user['id'];
@@ -45,7 +34,7 @@ if (!isset($_SESSION['is_loggedin']) && isset($_COOKIE['login_token'])) {
     }
 
     // If no valid session or token, redirect to login page
-    header('Location: /login.php');
+    header('Location: ../../index.php');
     exit();
 }
 
