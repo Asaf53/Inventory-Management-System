@@ -11,25 +11,32 @@ if (isset($_GET['category_id'])) {
     $stm_category_products->execute();
     $category_products = $stm_category_products->fetchAll(PDO::FETCH_ASSOC);
 
-    $sql_category = "SELECT `categories`.`name` as `category_name`, `categories`.`id` FROM `categories` WHERE `categories`.`id` = $category_id";
+    $sql_category = "SELECT `categories`.`name` as `category_name`, `categories`.`color` as `category_color`, `categories`.`id` FROM `categories` WHERE `categories`.`id` = $category_id";
     $stm_category = $pdo->prepare($sql_category);
     $stm_category->execute();
     $category = $stm_category->fetch(PDO::FETCH_ASSOC);
+
+    $sql_go_back = "SELECT `company_id` FROM `categories` WHERE `id` = $category_id";
+    $stm_go_back = $pdo->prepare($sql_go_back);
+    $stm_go_back->execute();
+    $go_back = $stm_go_back->fetch(PDO::FETCH_ASSOC);
+    $company_id = $go_back['company_id'];
 }
 
 // Process Delete Category Request
-if (isset($_POST['delete_category_btn'], $_POST['category_id'], $_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
+if (isset($_POST['delete_category_btn'], $_POST['category_id'], $_POST['company_id'], $_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
     $category_id = (int)$_POST['category_id'];
+    $company_id = (int)$_POST['company_id'];
 
     if (filter_var($category_id, FILTER_VALIDATE_INT)) {
         $sql_delete_category = "DELETE FROM `categories` WHERE id = ?";
         $stm_delete_category = $pdo->prepare($sql_delete_category);
 
         if ($stm_delete_category->execute([$category_id])) {
-            header('Location: categories.php?action=delete_category&status=success');
+            header("Location: categories.php?company_id=$company_id&action=delete_category&status=success");
             exit;
         } else {
-            header('Location: categories.php?action=delete_category&status=error');
+            header("Location: categories.php?company_id=$company_id&action=delete_category&status=error");
         }
     }
 }
@@ -107,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_category_btn'])
     $category_color = $_POST['category_color'];
 
     // Validate fields
-    if (empty($category_id) || empty($category_name)) {
+    if (empty($category_id) || empty($category_name) || empty($category_color)) {
         $category_update_errors[] = "Please fill in all the fields.";
     }
 
@@ -179,7 +186,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
 ?>
 <!-- Row -->
 
-<a href="categories.php" class="btn btn-transparent d-flex-inline justify-content-start align-items-center"><img src="./assets/icons/back.svg" alt="">Back</a>
+<a href="categories.php?company_id=<?=$company_id?>" class="btn btn-transparent d-flex-inline justify-content-start align-items-center"><img src="./assets/icons/back.svg" alt="">Back</a>
 <div class="container-fluid mt-3">
     <?php if (!empty($alert)) : ?>
         <div class="alert alert-<?= htmlspecialchars($status) === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show mt-3" role="alert">
@@ -200,6 +207,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                         style="display:inline;">
                         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                         <input type="hidden" name="category_id" value="<?= $category_id ?>">
+                        <input type="hidden" name="company_id" value="<?= $company_id ?>">
                         <button type="submit" name="delete_category_btn" class="btn btn-small btn-danger ms-2"
                             onclick="return confirm('Are you sure you want to delete this Category?');">
                             Delete Category
@@ -350,7 +358,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     </div>
                     <div class="mb-3">
                         <label for="category_color" class="form-label">Category Color</label>
-                        <input type="color" name="category_color" class="form-control form-control-color">
+                        <input type="color" name="category_color" value="<?= $category['category_color'] ?>" class="form-control form-control-color">
                     </div>
                 </div>
                 <div class="modal-footer">

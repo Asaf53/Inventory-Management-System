@@ -77,7 +77,7 @@ $sales = $stm_sales->fetchAll(PDO::FETCH_ASSOC);
             <div class="card bg-white border-0 rounded-0 border-bottom">
                 <div class="card-body d-flex justify-content-between">
                     <div class="d-flex flex-column">
-                        <h4><?= $sale['name'] ?> - <?= $sale['length'] ?></h4>
+                        <h4><?= $sale['name'] ?> - <?= $sale['length'] ?> - (<?= $sale['quantity'] ?> qty)</h4>
                         <p class="card-text text-secondary mb-0 fw-medium">from <?= $sale['sale_date'] ?></p>
                     </div>
                     <div class="d-flex justify-content-center align-items-center">
