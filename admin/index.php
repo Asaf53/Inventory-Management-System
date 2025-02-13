@@ -5,16 +5,18 @@
 // Query to fetch categories and products
 $query = "
     SELECT 
+        company.name AS company_name,
         categories.id AS category_id, 
         categories.name AS category_name, 
         products.id AS product_id, 
         products.name AS product_name,
         products.length AS product_length,
         inventorysummary.current_qty AS product_qty 
-    FROM categories 
+    FROM company
+    INNER JOIN categories ON company.id = categories.company_id
     LEFT JOIN products ON categories.id = products.category_id
     LEFT JOIN inventorysummary ON products.id = inventorysummary.product_id
-    ORDER BY categories.name, products.name, products.length DESC;
+    ORDER BY company.name, categories.name, products.name, products.length DESC;
 ";
 
 // Prepare and execute the query
@@ -27,20 +29,21 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Organize data into categories and products
 $data = [];
 foreach ($results as $row) {
+    $company_name = $row['company_name'];
     $category_name = $row['category_name'];
     $product_id = $row['product_id'];
     $product_name = $row['product_name'];
     $product_length = $row['product_length'];
     $product_qty = $row['product_qty'];
 
-    // Initialize the category array if not already set
-    if (!isset($data[$category_name])) {
-        $data[$category_name] = [];
+    if (!isset($data[$company_name])) {
+        $data[$company_name] = [];
     }
-
-    // Add the product id and name to the category if it exists
+    if (!isset($data[$company_name][$category_name])) {
+        $data[$company_name][$category_name] = [];
+    }
     if ($product_name) {
-        $data[$category_name][] = [
+        $data[$company_name][$category_name][] = [
             'id' => $product_id,
             'name' => $product_name,
             'length' => $product_length,
@@ -184,8 +187,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
     if (empty($transaction_product_errors)) {
         header("Location: index.php?action=product_qty&status=success");
     } else {
+        print_r($transaction_product_errors);
         // Optionally handle errors by redirecting or displaying error messages
-        header("Location: index.php?action=product_qty&status=error");
+        // header("Location: index.php?action=product_qty&status=error");
     }
     exit();
 }
@@ -281,17 +285,25 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="categoryProductSelect" class="form-label">Select Product</label>
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex flex-column">
                                 <select id="categorySelectOutgoing" class="form-select">
                                     <option value="">Select a category</option>
-                                    <?php foreach (array_keys($data) as $category): ?>
-                                        <option value="<?= htmlspecialchars($category) ?>"><?= htmlspecialchars($category) ?></option>
+                                    <?php foreach ($data as $company => $categories): ?>
+                                        <optgroup label="<?= htmlspecialchars($company) ?>">
+                                            <?php foreach ($categories as $category => $products): ?>
+                                                <option value="<?= htmlspecialchars($category) ?>" data-company="<?= htmlspecialchars($company) ?>">
+                                                    <?= htmlspecialchars($category) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </optgroup>
                                     <?php endforeach; ?>
                                 </select>
 
-                                <select id="productSelectOutgoing" class="form-select" name="product_id" disabled>
+                                <select id="productSelectOutgoing" name="product_id" class="form-select mt-2" disabled>
                                     <option value="">Select a product</option>
                                 </select>
+
+                                <div id="qtyDisplay" class="mt-2 text-dark"></div>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -323,17 +335,25 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="categoryProductSelect" class="form-label">Select Product</label>
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex flex-column">
                                 <select id="categorySelectIncoming" class="form-select">
                                     <option value="">Select a category</option>
-                                    <?php foreach (array_keys($data) as $category): ?>
-                                        <option value="<?= htmlspecialchars($category) ?>"><?= htmlspecialchars($category) ?></option>
+                                    <?php foreach ($data as $company => $categories): ?>
+                                        <optgroup label="<?= htmlspecialchars($company) ?>">
+                                            <?php foreach ($categories as $category => $products): ?>
+                                                <option value="<?= htmlspecialchars($category) ?>" data-company="<?= htmlspecialchars($company) ?>">
+                                                    <?= htmlspecialchars($category) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </optgroup>
                                     <?php endforeach; ?>
                                 </select>
 
-                                <select id="productSelectIncoming" class="form-select" name="product_id" disabled>
+                                <select id="productSelectIncoming" name="product_id" class="form-select mt-2" disabled>
                                     <option value="">Select a product</option>
                                 </select>
+
+                                <div id="qtyDisplay" class="mt-2 text-dark"></div>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -370,56 +390,51 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
         const productSelect = document.getElementById(productSelectId);
         const qtyDisplay = document.getElementById(qtyDisplayId);
 
-        categorySelect.addEventListener('change', function() {
+        categorySelect.addEventListener("change", function() {
             const selectedCategory = this.value;
+            const selectedOption = this.options[this.selectedIndex];
+            const company = selectedOption.getAttribute("data-company");
 
-            // Clear the product dropdown and reset quantity display
+            // Clear previous products
             productSelect.innerHTML = '<option value="">Select a product</option>';
+            productSelect.disabled = true;
             qtyDisplay.textContent = "";
 
-            if (selectedCategory && data[selectedCategory]) {
-                // Populate the product dropdown with products of the selected category
-                data[selectedCategory].forEach(product => {
-                    const option = document.createElement('option');
+            if (selectedCategory && company && data[company][selectedCategory]) {
+                data[company][selectedCategory].forEach(product => {
+                    const option = document.createElement("option");
                     option.value = product.id;
                     option.textContent = `${product.name} (${product.length})`;
                     productSelect.appendChild(option);
                 });
 
-                // Enable the product dropdown
                 productSelect.disabled = false;
-            } else {
-                // Disable the product dropdown if no valid category is selected
-                productSelect.disabled = true;
             }
         });
 
-        productSelect.addEventListener('change', function() {
+        productSelect.addEventListener("change", function() {
+            const selectedCategory = categorySelect.value;
             const selectedProductId = this.value;
+            const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+            const company = selectedOption.getAttribute("data-company");
 
             if (selectedProductId) {
-                // Find the selected product's data to display quantity
-                const selectedCategory = categorySelect.value;
-                const selectedProduct = data[selectedCategory].find(product => product.id == selectedProductId);
-
-                // Update quantity display and set class based on condition
+                const selectedProduct = data[company][selectedCategory].find(product => product.id == selectedProductId);
                 const qty = selectedProduct ? selectedProduct.qty : 0;
                 qtyDisplay.textContent = `Qty: ${qty}`;
-                qtyDisplay.classList.remove('text-danger', 'text-dark'); // Remove any existing classes
-                qtyDisplay.classList.add(qty < 8 ? 'text-danger' : 'text-dark'); // Add appropriate class
+                qtyDisplay.classList.remove("text-danger", "text-dark");
+                qtyDisplay.classList.add(qty < 8 ? "text-danger" : "text-dark");
             } else {
-                // Clear quantity display if no product is selected
                 qtyDisplay.textContent = "";
-                qtyDisplay.classList.remove('text-danger', 'text-dark'); // Remove classes
-                qtyDisplay.classList.add('text-dark'); // Default class
+                qtyDisplay.classList.remove("text-danger", "text-dark");
+                qtyDisplay.classList.add("text-dark");
             }
         });
-
     }
 
     // Setup dropdowns for both modals
-    setupDropdowns('categorySelectIncoming', 'productSelectIncoming', 'qtyDisplayIncoming');
-    setupDropdowns('categorySelectOutgoing', 'productSelectOutgoing', 'qtyDisplayOutgoing');
+    setupDropdowns("categorySelectIncoming", "productSelectIncoming", "qtyDisplayIncoming");
+    setupDropdowns("categorySelectOutgoing", "productSelectOutgoing", "qtyDisplayOutgoing");
 </script>
 
 
