@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
         $transaction_product_errors[] = "Please fill in all the fields.";
     } else {
         // Get the current quantity from InventorySummary
-        $currentQtySql = "SELECT current_qty, `products`.`name` as `product_name` FROM `inventorysummary` INNER JOIN `products` ON `inventorysummary`.`product_id` = `products`.`id` WHERE `inventorysummary`.`product_id` = ?";
+        $currentQtySql = "SELECT current_qty, `categories`.`name` as `category_name`, `products`.`length` as `product_length` FROM `inventorysummary` INNER JOIN `products` ON `inventorysummary`.`product_id` = `products`.`id` INNER JOIN `categories` ON `products`.`category_id` = `categories`.`id` WHERE `inventorysummary`.`product_id` = ?";
         $stmt = $pdo->prepare($currentQtySql);
         $stmt->execute([$product_id]);
 
@@ -109,51 +109,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
                             $access_token = $access_token['bearer'];
 
                             // Recipient's phone number
-                            $to = "38970832727";
+                            $recipients = ["38970832727", "38970395888"];
 
                             // Message payload for the custom template
-                            $data = [
-                                "messaging_product" => "whatsapp",
-                                "to" => $to,
-                                "type" => "template",
-                                "template" => [
-                                    "name" => "low_stock_alert_titan_cink", // Replace with your approved template name
-                                    "language" => [
-                                        "code" => "en_US"
-                                    ],
-                                    "components" => [
-                                        [
-                                            "type" => "body",
-                                            "parameters" => [
-                                                ["type" => "text", "text" => $product_name], // Placeholder {{1}}
-                                                ["type" => "text", "text" => (string)$updated_qty] // Placeholder {{2}}
+                            foreach ($recipients as $to) {
+                                // Message payload for the custom template
+                                $data = [
+                                    "messaging_product" => "whatsapp",
+                                    "to" => $to,
+                                    "type" => "template",
+                                    "template" => [
+                                        "name" => "low_stock_alert_titan_cink", // Replace with your approved template name
+                                        "language" => ["code" => "en_US"],
+                                        "components" => [
+                                            [
+                                                "type" => "body",
+                                                "parameters" => [
+                                                    ["type" => "text", "text" => $category_name], // Placeholder {{1}}
+                                                    ["type" => "text", "text" => $product_length], // Placeholder {{2}}
+                                                    ["type" => "text", "text" => (string)$updated_qty] // Placeholder {{3}}
+                                                ]
                                             ]
                                         ]
                                     ]
-                                ]
-                            ];
+                                ];
 
-                            // Initialize cURL
-                            $ch = curl_init();
-                            curl_setopt($ch, CURLOPT_URL, $api_url);
-                            curl_setopt($ch, CURLOPT_POST, true);
-                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                                "Authorization: Bearer $access_token",
-                                "Content-Type: application/json"
-                            ]);
-                            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+                                // Initialize cURL
+                                $ch = curl_init();
+                                curl_setopt($ch, CURLOPT_URL, $api_url);
+                                curl_setopt($ch, CURLOPT_POST, true);
+                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                                    "Authorization: Bearer $access_token",
+                                    "Content-Type: application/json"
+                                ]);
+                                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-                            // Execute the request
-                            $response = curl_exec($ch);
-                            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                                // Execute the request
+                                $response = curl_exec($ch);
+                                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-                            // Check response
-                            if ($http_code !== 200) {
-                                echo "Failed to send WhatsApp alert message. Response: " . $response;
+                                // Check response
+                                if ($http_code !== 200) {
+                                    echo "Failed to send WhatsApp alert to $to. Response: " . $response;
+                                }
+
+                                curl_close($ch);
                             }
-
-                            curl_close($ch);
                         }
                     }
                     break;
