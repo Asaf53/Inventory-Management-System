@@ -217,7 +217,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
             </div>
             <div class="table-responsive text-nowrap mt-3">
                 <table class="table table-striped align-middle overflow-scroll col-12" id="table"
-                    data-search-align="left" data-pagination="true" data-toggle="table" data-search="true"
+                    data-search-align="left" data-toggle="table" data-search="true"
                     data-searchable="true">
                     <thead>
                         <tr>
