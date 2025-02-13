@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product_btn'])) {
     $product_qty = $_POST['product_qty'];
 
     // Validate fields
-    if (empty($product_name) || empty($product_length) || empty($category_id) || empty($product_qty)) {
+    if (empty($product_name) || empty($product_length) || empty($category_id)) {
         $product_errors[] = "Please fill in all the fields.";
     }
 
