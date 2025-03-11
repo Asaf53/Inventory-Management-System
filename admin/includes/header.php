@@ -7,26 +7,25 @@ if (!isset($_SESSION['is_loggedin']) && isset($_COOKIE['login_token'])) {
     $loginToken = $_COOKIE['login_token'];
 
     try {
-        // Prepare the statement to fetch the user
-        $stmt = $conn->prepare("SELECT id, role, login_token FROM `user` WHERE login_token IS NOT NULL");
+        // Secure query to fetch user by login token
+        $stmt = $conn->prepare("SELECT id, role, login_token FROM `user` WHERE login_token = ?");
+        $stmt->bind_param("s", $loginToken);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        while ($user = $result->fetch_assoc()) {
-            if (password_verify($loginToken, $user['login_token'])) {
-                // Restore session variables
-                $_SESSION['is_loggedin'] = true;
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['role'] = $user['role'];
+        if ($user = $result->fetch_assoc()) {
+            // Restore session variables
+            $_SESSION['is_loggedin'] = true;
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['role'] = $user['role'];
 
-                // Redirect based on role
-                if ($_SESSION['role'] === 'admin') {
-                    header('Location: /admin/index.php');
-                    exit();
-                } else {
-                    header('Location: /admin/error.html');
-                    exit();
-                }
+            // Redirect based on role
+            if ($_SESSION['role'] === 'admin') {
+                header('Location: /admin/index.php');
+                exit();
+            } else {
+                header('Location: /admin/error.html');
+                exit();
             }
         }
     } catch (Exception $e) {
@@ -40,16 +39,16 @@ if (!isset($_SESSION['is_loggedin']) && isset($_COOKIE['login_token'])) {
 
 // Regular session-based role check for logged-in users
 if (!isset($_SESSION['is_loggedin']) || $_SESSION['role'] !== 'admin') {
-    header('Location: /admin/error.html');
+    header('Location: ../../index.php');
     exit();
 }
 
-
+// Handle logout request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'logout') {
     if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        // Clear cookies (if login persistence was implemented)
+        // Securely clear login cookie
         if (isset($_COOKIE['login_token'])) {
-            setcookie('login_token', '', time() - 3600, "/");
+            setcookie('login_token', '', time() - 3600, "/", "", true, true);
         }
 
         // Clear session variables
