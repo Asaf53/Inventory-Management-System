@@ -18,6 +18,8 @@ if (isset($_GET['daterange'])) {
     $sql_sales .= " WHERE `sales`.`sale_date` BETWEEN :start_date AND :end_date";
 }
 
+$sql_sales .= " ORDER BY `sales`.`sale_date` DESC";
+
 // Prepare the SQL statement
 $stm_sales = $pdo->prepare($sql_sales);
 
