@@ -16,7 +16,7 @@ $query = "
     INNER JOIN categories ON company.id = categories.company_id
     LEFT JOIN products ON categories.id = products.category_id
     LEFT JOIN inventorysummary ON products.id = inventorysummary.product_id
-    ORDER BY company.name, categories.name, products.name, products.length DESC;
+    ORDER BY company.name, categories.name, CAST(products.length AS DOUBLE) DESC;
 ";
 
 // Prepare and execute the query

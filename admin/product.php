@@ -6,7 +6,8 @@ if (isset($_GET['category_id'])) {
     $category_id = $_GET['category_id'];
     $sql_category_products =
         "SELECT *, `products`.`name` as `product_name`, `inventorysummary`.`current_qty` as `product_qty` FROM `products`
-    INNER JOIN `inventorysummary` ON `products`.`id` = `inventorysummary`.`product_id` WHERE `products`.`category_id` = $category_id";
+    INNER JOIN `inventorysummary` ON `products`.`id` = `inventorysummary`.`product_id` WHERE `products`.`category_id` = $category_id
+    ORDER BY CAST(`products`.`length` AS DOUBLE) DESC";
     $stm_category_products = $pdo->prepare($sql_category_products);
     $stm_category_products->execute();
     $category_products = $stm_category_products->fetchAll(PDO::FETCH_ASSOC);
@@ -221,8 +222,8 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                     data-searchable="true">
                     <thead>
                         <tr>
-                            <th scope="col" class="text-center" data-sortable="true">Length(m)</th>
-                            <th scope="col" class="text-center" data-sortable="true">Qty</th>
+                            <th scope="col" class="text-center">Length(m)</th>
+                            <th scope="col" class="text-center">Qty</th>
                             <th scope="col" class="text-center">Action</th>
                         </tr>
                     </thead>
