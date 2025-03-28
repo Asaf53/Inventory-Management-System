@@ -424,7 +424,7 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                 const qty = selectedProduct ? selectedProduct.qty : 0;
                 qtyDisplay.textContent = `Qty: ${qty}`;
                 qtyDisplay.classList.remove("text-danger", "text-dark");
-                qtyDisplay.classList.add(qty < 8 ? "text-danger" : "text-dark");
+                qtyDisplay.classList.add(qty < 10 ? "text-danger" : "text-dark");
             } else {
                 qtyDisplay.textContent = "";
                 qtyDisplay.classList.remove("text-danger", "text-dark");
