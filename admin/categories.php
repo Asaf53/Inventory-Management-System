@@ -24,13 +24,20 @@ $stm_categories = $pdo->prepare($sql_categories);
 $stm_categories->execute(['company_id' => $company_id]);
 $categories = $stm_categories->fetchAll(PDO::FETCH_ASSOC);
 
-$sql_product_m = "SELECT `products`.`length` AS `product_length`, `inventorysummary`.`current_qty` AS `product_qty` FROM `products` INNER JOIN `inventorysummary` ON `products`.`id` = `inventorysummary`.`product_id`";
+$sql_product_m2 = "SELECT p.category_id, SUM(p.length * i.current_qty) AS total_m2
+FROM `products` p
+INNER JOIN `inventorysummary` i ON p.id = i.product_id
+GROUP BY p.category_id";
 
-$stm_product_m = $pdo->prepare($sql_product_m);
-$stm_product_m->execute();
-$product_m = $stm_product_m->fetchAll(PDO::FETCH_ASSOC);
+$stm_product_m2 = $pdo->prepare($sql_product_m2);
+$stm_product_m2->execute();
+$product_m2 = $stm_product_m2->fetchAll(PDO::FETCH_ASSOC);
 
-print_r($product_m);
+// Convert the result into an associative array for easy lookup
+$m2_by_category = [];
+foreach ($product_m2 as $row) {
+    $m2_by_category[$row['category_id']] = $row['total_m2'];
+}
 
 $categry_errors = [];
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category_btn'])) {
@@ -149,7 +156,12 @@ if (isset($_GET['action']) && isset($_GET['status'])) {
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
                                     <h6 class="card-title m-0"><img src="./assets/icons/folder.svg" alt=""></h6>
-                                    <h6 class="card-title text-white m-0 ms-1"><?= $category['category_name'] ?></h6>
+                                    <div class="d-flex flex-column">
+                                        <h6 class="card-title text-white m-0 ms-1"><?= $category['category_name'] ?></h6>
+                                        <h6 class="card-text text-white m-0 ms-1">
+                                            <?= isset($m2_by_category[$category['category_id']]) ? number_format($m2_by_category[$category['category_id']], 2) . " m²" : "0.00 m²" ?>
+                                        </h6>
+                                    </div>
                                 </div>
                                 <h6 class="card-text text-white m-0"><?= $category['product_count'] ?></h6>
                             </div>

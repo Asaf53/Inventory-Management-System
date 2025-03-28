@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
                         ]);
 
                         // Check if the updated quantity is below the threshold
-                        if ($updated_qty < 8) {
+                        if ($updated_qty < 10) {
                             // WhatsApp Notification
                             $sql_access_token = "SELECT `bearer` FROM `system`";
                             $sql_access_token = $pdo->prepare($sql_access_token);
@@ -109,51 +109,52 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
                             $access_token = $access_token['bearer'];
 
                             // Recipient's phone number
-                            $to = "38970832727";
+                            $recipients = ["38970832727", "38970395888"];
 
                             // Message payload for the custom template
-                            $data = [
-                                "messaging_product" => "whatsapp",
-                                "to" => $to,
-                                "type" => "template",
-                                "template" => [
-                                    "name" => "low_stock_alert_titan_cink", // Replace with your approved template name
-                                    "language" => [
-                                        "code" => "en_US"
-                                    ],
-                                    "components" => [
-                                        [
-                                            "type" => "body",
-                                            "parameters" => [
-                                                ["type" => "text", "text" => $product_name], // Placeholder {{1}}
-                                                ["type" => "text", "text" => (string)$updated_qty] // Placeholder {{2}}
+                            foreach ($recipients as $to) {
+                                $data = [
+                                    "messaging_product" => "whatsapp",
+                                    "to" => $to,
+                                    "type" => "template",
+                                    "template" => [
+                                        "name" => "low_stock_alert_titan_cink", // Replace with your approved template name
+                                        "language" => ["code" => "en_US"],
+                                        "components" => [
+                                            [
+                                                "type" => "body",
+                                                "parameters" => [
+                                                    ["type" => "text", "text" => $category_name], // Placeholder {{1}}
+                                                    ["type" => "text", "text" => $product_length], // Placeholder {{2}}
+                                                    ["type" => "text", "text" => (string)$updated_qty] // Placeholder {{3}}
+                                                ]
                                             ]
                                         ]
                                     ]
-                                ]
-                            ];
+                                ];
 
-                            // Initialize cURL
-                            $ch = curl_init();
-                            curl_setopt($ch, CURLOPT_URL, $api_url);
-                            curl_setopt($ch, CURLOPT_POST, true);
-                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                                "Authorization: Bearer $access_token",
-                                "Content-Type: application/json"
-                            ]);
-                            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+                                // Initialize cURL
+                                $ch = curl_init();
+                                curl_setopt($ch, CURLOPT_URL, $api_url);
+                                curl_setopt($ch, CURLOPT_POST, true);
+                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                                    "Authorization: Bearer $access_token",
+                                    "Content-Type: application/json"
+                                ]);
+                                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-                            // Execute the request
-                            $response = curl_exec($ch);
-                            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                                // Execute the request
+                                $response = curl_exec($ch);
+                                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-                            // Check response
-                            if ($http_code !== 200) {
-                                echo "Failed to send WhatsApp alert message. Response: " . $response;
+                                // Check response
+                                if ($http_code !== 200) {
+                                    echo "Failed to send WhatsApp alert message. Response: " . $response;
+                                }
+
+                                curl_close($ch);
                             }
-
-                            curl_close($ch);
                         }
                     }
                     break;
