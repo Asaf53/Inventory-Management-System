@@ -24,6 +24,13 @@ $stm_categories = $pdo->prepare($sql_categories);
 $stm_categories->execute(['company_id' => $company_id]);
 $categories = $stm_categories->fetchAll(PDO::FETCH_ASSOC);
 
+$sql_product_m = "SELECT `products`.`length` AS `product_length`, `inventorysummary`.`current_qty` AS `product_qty` FROM `products` INNER JOIN `inventorysummary` ON `products`.`id` = `inventorysummary`.`product_id`";
+
+$stm_product_m = $pdo->prepare($sql_product_m);
+$stm_product_m->execute();
+$product_m = $stm_product_m->fetchAll(PDO::FETCH_ASSOC);
+
+print_r($product_m);
 
 $categry_errors = [];
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category_btn'])) {
