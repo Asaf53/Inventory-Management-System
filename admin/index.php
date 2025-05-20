@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (isset($_POST['outgoing_btn']) || is
                             $access_token = $access_token['bearer'];
 
                             // Recipient's phone number
-                            $recipients = ["38970832727", "38970395888"];
+                            $recipients = ["000111222333", "000111222333"];
 
                             // Message payload for the custom template
                             foreach ($recipients as $to) {
